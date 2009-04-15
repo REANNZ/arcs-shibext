@@ -1,0 +1,2 @@
+urn\:mace\:arcs.org.au\:shibboleth\:2.0\:resolver\:dc = au.org.arcs.shibext.sharedtoken.SharedTokenDataConnectorNamespaceHandler
+urn\:mace\:arcs.org.au\:shibboleth\:2.0\:resolver\:dc = au.org.arcs.shibext.targetedid.SharedTokenDataConnectorNamespaceHandler
