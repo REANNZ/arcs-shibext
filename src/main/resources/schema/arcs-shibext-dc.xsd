@@ -102,14 +102,6 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				<attribute name="storeLdap" type="boolean">
-					<annotation>
-						<documentation>
-							Whether to store the computed ID to the Ldap
-							repository.
-						</documentation>
-					</annotation>
-				</attribute>
 
 			</extension>
 		</complexContent>
