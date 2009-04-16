@@ -12,6 +12,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import au.org.arcs.shibext.handler.ARCSDataConnectorNamespaceHandler;
+
 import edu.internet2.middleware.shibboleth.common.config.attribute.resolver.dataConnector.BaseDataConnectorBeanDefinitionParser;
 
 /**
@@ -23,7 +25,7 @@ public class TargetedIDDataConnectorBeanDefinitionParser extends
 
 	/** Schema type name. */
 	public static final QName TYPE_NAME = new QName(
-			TargetedIDDataConnectorNamespaceHandler.NAMESPACE, "TargetedID");
+			ARCSDataConnectorNamespaceHandler.NAMESPACE, "TargetedID");
 
 	/** {@inheritDoc} */
 	@Override

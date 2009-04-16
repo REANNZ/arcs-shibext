@@ -5,15 +5,19 @@
 	xmlns="http://www.w3.org/2001/XMLSchema"
 	xmlns:dc="urn:mace:shibboleth:2.0:resolver:dc"
 	xmlns:resolver="urn:mace:shibboleth:2.0:resolver"
+	xmlns:sec="urn:mace:shibboleth:2.0:security"
+	xmlns:arcs="urn:mace:arcs.org.au:shibboleth:2.0:resolver:dc"
 	elementFormDefault="qualified">
 
 	<import namespace="urn:mace:shibboleth:2.0:resolver"
 		schemaLocation="classpath:/schema/shibboleth-2.0-attribute-resolver.xsd" />
 
+	<import namespace="urn:mace:shibboleth:2.0:security"
+		schemaLocation="classpath:/schema/shibboleth-2.0-security.xsd" />
+
 
 	<import namespace="urn:mace:shibboleth:2.0:resolver:dc"
 		schemaLocation="classpath:/schema/shibboleth-2.0-attribute-resolver-dc.xsd" />
-
 
 	<complexType name="SharedToken">
 		<annotation>

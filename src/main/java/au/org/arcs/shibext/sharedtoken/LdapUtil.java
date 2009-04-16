@@ -47,17 +47,16 @@ public class LdapUtil {
 
 	private static String PROPERTIES_FILE = "conf/sharedtoken.properties";
 
-	public void LdapUtil() throws IMASTException {
+	public LdapUtil() throws IMASTException {
 
 		shareTokenProperties = new Properties();
 		try {
 			shareTokenProperties.load(this.getClass().getClassLoader()
-					.getResourceAsStream("PROPERTIES_FILE"));
+					.getResourceAsStream(PROPERTIES_FILE));
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new IMASTException(e.getMessage().concat("\n couldn't load ")
-					.concat(PROPERTIES_FILE).concat(" file"));
-		}
+					.concat(PROPERTIES_FILE).concat(" file"), e.getCause());
+		} 
 	}
 
 	public void saveAttribute(String attributeName, String attributeValue,
@@ -65,10 +64,10 @@ public class LdapUtil {
 		
 		log.info("start to store sharedToken to Ldap");
 
-		log.info("attributeName" + attributeName);
-		log.info("attributeValue" + attributeValue);
-		log.info("dataConnectorID" + dataConnectorID);
-		log.info("principalName" + principalName);
+		log.info("attributeName: " + attributeName);
+		log.info("attributeValue: " + attributeValue);
+		log.info("dataConnectorID: " + dataConnectorID);
+		log.info("principalName " + principalName);
 
 		try {
 
@@ -94,9 +93,10 @@ public class LdapUtil {
 			Attribute mod0 = new BasicAttribute(attributeName, attributeValue);
 			ModificationItem[] mods = new ModificationItem[1];
 			
-			log.info("just try to modify ldap entry");
+			log.info("adding sharedToken to ldap entry");
 
 			mods[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod0);
+			log.info("add successfully");
 			try {
 				context.modifyAttributes(searchFilter, mods);
 			} catch (NamingException e) {
@@ -109,9 +109,8 @@ public class LdapUtil {
 				// dirContext.modifyAttributes(populatedSearch, mods);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new IMASTException(e.getMessage().concat(
-					"\n failed to add sharedToken to ldap entry"), e.getCause());
+					"\n failed to save attribute to ldap entry"), e.getCause());
 
 		}
 
@@ -213,7 +212,6 @@ public class LdapUtil {
 			properties.put(Context.SECURITY_CREDENTIALS, pricipalCre);
 			properties.put("useStartTLS", useStartTLS);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new IMASTException(e.getMessage().concat(
 					"\n fail to build ldap properties"));
 		}
@@ -249,8 +247,8 @@ public class LdapUtil {
 					.getElementsByTagName("FilterTemplate").item(0)
 					.getTextContent().trim());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage());
+			
+			throw new IMASTException(e.getMessage(),e.getCause());
 		}
 		return ldapRawProperties;
 

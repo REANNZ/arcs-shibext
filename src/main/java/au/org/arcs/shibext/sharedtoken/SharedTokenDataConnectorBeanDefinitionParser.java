@@ -13,6 +13,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import au.org.arcs.shibext.handler.ARCSDataConnectorNamespaceHandler;
+
 import edu.internet2.middleware.shibboleth.common.config.attribute.resolver.dataConnector.BaseDataConnectorBeanDefinitionParser;
 
 /**
@@ -24,7 +26,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 	/** Schema type name. */
 	public static final QName TYPE_NAME = new QName(
-			SharedTokenDataConnectorNamespaceHandler.NAMESPACE, "SharedToken");
+			ARCSDataConnectorNamespaceHandler.NAMESPACE, "SharedToken");
 
 	/** {@inheritDoc} */
 	@Override

@@ -95,9 +95,14 @@ public class TargetedIDDataConnectorBeanFactory extends
 
 	/** {@inheritDoc} */
 	protected Object createInstance() throws Exception {
-		TargetedIDDataConnector connector = new TargetedIDDataConnector(
+		TargetedIDDataConnector connector = null;
+		try{
+		connector = new TargetedIDDataConnector(
 				getGeneratedAttribute(), getSourceAttribute(), getSalt());
 		populateDataConnector(connector);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return connector;
 	}
 

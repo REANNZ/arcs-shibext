@@ -86,10 +86,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 			this.storeLdap = storeLdap;
 		} catch (Exception e) {
-			//catch any exception so that the IdP will not screw up. 
+			// catch any exception so that the IdP will not screw up.
 			e.printStackTrace();
-			log.warn(e.getMessage().concat(
-					"\n failed to construct SharedTokenDataConnector"));
+			log.error("failed to construct SharedTokenDataConnector object");
 		}
 
 	}
@@ -112,10 +111,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					resolutionContext, STORED_ATTRIBUTE_NAME);
 			String sharedToken = null;
 			if (col.size() < 1) {
+				log.info("sharedToken is not existing, will generate a new one.");
 				sharedToken = getSharedToken(resolutionContext);
 				if (getStoreLdap())
 					storeSharedToken(resolutionContext, sharedToken);
 			} else {
+				log.info("sharedToken is existing, will not generate a new one.");
 				sharedToken = col.iterator().next().toString();
 			}
 			BasicAttribute<String> attribute = new BasicAttribute<String>();
@@ -123,8 +124,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			attribute.getValues().add(sharedToken);
 			attributes.put(attribute.getId(), attribute);
 		} catch (Exception e) {
-			//catch any exception so that the IdP will not screw up. 
-			log.warn("failed to resolve " + STORED_ATTRIBUTE_NAME);
+			// catch any exception so that the IdP will not screw up.
+			log.error("failed to resolve " + STORED_ATTRIBUTE_NAME);
 			e.printStackTrace();
 		}
 		return attributes;
@@ -146,8 +147,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			throws AttributeResolutionException {
 
 		String localId = getLocalId(resolutionContext);
-		String	persistentId = this.createSharedToken(resolutionContext,
-					localId, salt);
+		String persistentId = this.createSharedToken(resolutionContext,
+				localId, salt);
 		return persistentId;
 
 	}
@@ -174,12 +175,13 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			} catch (IMASTException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				log.warn("failed to store sharedToken to Ldap");
+				log.error("failed to store sharedToken to Ldap");
 			}
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			e.printStackTrace();
-			log.warn("error happened when try to add sharedToken to Ldap. ");
+			log.error(e.getMessage().concat(
+					"\n failed to store sharedToken to Ldap. "));
 		}
 	}
 
@@ -212,6 +214,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			persistentId = new String(encodedValue);
 			persistentId = this.replace(persistentId);
 		} catch (Exception e) {
+			log.error("\n failed to create the sharedToken. ");
 			throw new AttributeResolutionException(e.getMessage().concat(
 					"\n failed to create the sharedToken."));
 		}
@@ -259,7 +262,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			throws AttributeResolutionException {
 
 		log.info("gets local ID components ...");
-		
+
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 
 		StringBuffer localIdValue = new StringBuffer();
