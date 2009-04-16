@@ -29,7 +29,7 @@ public class TargetedIDDataConnectorBeanFactory extends
 
 	/** {@inheritDoc} */
 	public Class getObjectType() {
-		return TargetedIDDataConnectorBeanFactory.class;
+		return TargetedIDDataConnector.class;
 	}
 
 	/**
