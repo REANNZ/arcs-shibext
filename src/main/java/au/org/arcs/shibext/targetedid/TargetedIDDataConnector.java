@@ -55,40 +55,55 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 *            salt used when computing the ID
 	 */
 	public TargetedIDDataConnector(String generatedAttributeId,
-			String sourceAttributeId, byte[] idSalt) throws Exception{
+			String sourceAttributeId, byte[] idSalt) {
 
-		log.info("construct TargetedIDDataConnector ...");
-		if (DatatypeHelper.isEmpty(generatedAttributeId)) {
-			throw new IllegalArgumentException(
-					"Provided generated attribute ID must not be empty");
-		}
-		generatedAttribute = generatedAttributeId;
+		try {
+			log.info("construct TargetedIDDataConnector ...");
+			if (DatatypeHelper.isEmpty(generatedAttributeId)) {
+				throw new IllegalArgumentException(
+						"Provided generated attribute ID must not be empty");
+			}
+			generatedAttribute = generatedAttributeId;
 
-		if (DatatypeHelper.isEmpty(sourceAttributeId)) {
-			throw new IllegalArgumentException(
-					"Provided source attribute ID must not be empty");
-		}
-		sourceAttribute = sourceAttributeId;
+			if (DatatypeHelper.isEmpty(sourceAttributeId)) {
+				throw new IllegalArgumentException(
+						"Provided source attribute ID must not be empty");
+			}
+			sourceAttribute = sourceAttributeId;
 
-		if (idSalt.length < 16) {
-			throw new IllegalArgumentException(
-					"Provided salt must be at least 16 bytes in size.");
+			if (idSalt.length < 16) {
+				throw new IllegalArgumentException(
+						"Provided salt must be at least 16 bytes in size.");
+			}
+			salt = idSalt;
+		} catch (Exception e) {
+			// catch any exception to let IdP go on
+			log.error(e.getMessage().concat(
+					"\n failed to construct TargetedIDDataConnector "));
 		}
-		salt = idSalt;
 	}
 
 	/** {@inheritDoc} */
 	public Map<String, BaseAttribute> resolve(
 			ShibbolethResolutionContext resolutionContext)
 			throws AttributeResolutionException {
+		
+		log.info("starting TargetedIDDataConnector.resolve( ) ...");
 
-		log.info("TargetedIDDataConnector.resolve( ) is called ...");
-		String targetedID = getTargetedID(resolutionContext);
-		BasicAttribute<String> attribute = new BasicAttribute<String>();
-		attribute.setId(getGeneratedAttributeId());
-		attribute.getValues().add(targetedID);
 		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
-		attributes.put(attribute.getId(), attribute);
+
+		try {
+			String targetedID = getTargetedID(resolutionContext);
+			BasicAttribute<String> attribute = new BasicAttribute<String>();
+			attribute.setId(getGeneratedAttributeId());
+			attribute.getValues().add(targetedID);
+			attributes.put(attribute.getId(), attribute);
+			log.info("successfully generated " + generatedAttribute + " : " + targetedID);
+		} catch (Exception e) {
+			// catch any exception to let IdP go on
+			log.error(e.getMessage().concat("\n failed to resolve ").concat(
+					generatedAttribute));
+		}
 		return attributes;
 	}
 
@@ -126,11 +141,12 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 */
 	private String getLocalId(ShibbolethResolutionContext resolutionContext)
 			throws AttributeResolutionException {
-		log.info("gets local ID components ...");
+		log.info("gets local ID ...");
+
+		StringBuffer localIdValue = new StringBuffer();
 
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 
-		StringBuffer localIdValue = new StringBuffer();
 		for (int i = 0; i < ids.length; i++) {
 
 			Collection<Object> sourceIdValues = getValuesFromAllDependencies(
@@ -171,20 +187,31 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 * 
 	 * @return the created identifier
 	 */
-	protected String createTargetedID(
+	private String createTargetedID(
 			ShibbolethResolutionContext resolutionContext, String localId,
-			byte[] salt) {
+			byte[] salt) throws AttributeResolutionException {
 
-		String localEntityID = resolutionContext.getAttributeRequestContext()
-				.getLocalEntityId();
-		String peerEntityID = resolutionContext.getAttributeRequestContext()
-				.getInboundMessageIssuer();
-		String globalUniqueID = localId + localEntityID + peerEntityID
-				+ new String(salt);
-		byte[] hashValue = DigestUtils.sha(globalUniqueID);
-		byte[] encodedValue = Base64.encodeBase64(hashValue);
-		String targetedID = new String(encodedValue);
-		targetedID = this.replace(targetedID);
+		log.info("creating targetedID");
+		String targetedID = null;
+
+		try {
+			String localEntityID = resolutionContext
+					.getAttributeRequestContext().getLocalEntityId();
+			String peerEntityID = resolutionContext
+					.getAttributeRequestContext().getInboundMessageIssuer();
+			String globalUniqueID = localId + localEntityID + peerEntityID
+					+ new String(salt);
+			log.info("the tuple of user/IdP/SP : " + localId + " / "
+					+ localEntityID + " / " + peerEntityID);
+			byte[] hashValue = DigestUtils.sha(globalUniqueID);
+			byte[] encodedValue = Base64.encodeBase64(hashValue);
+			targetedID = new String(encodedValue);
+			targetedID = this.replace(targetedID);
+
+		} catch (Exception e) {
+			log.error("failed to create the targetedID");
+			throw new AttributeResolutionException(e.getMessage());
+		}
 		return targetedID;
 	}
 
