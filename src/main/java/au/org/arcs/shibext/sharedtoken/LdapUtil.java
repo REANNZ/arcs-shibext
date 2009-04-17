@@ -62,7 +62,7 @@ public class LdapUtil {
 	public void saveAttribute(String attributeName, String attributeValue,
 			String dataConnectorID, String principalName) throws IMASTException {
 		
-		log.info("start to store sharedToken to Ldap");
+		log.info("storing sharedToken to Ldap ...");
 
 		log.info("attributeName: " + attributeName);
 		log.info("attributeValue: " + attributeValue);
@@ -109,9 +109,9 @@ public class LdapUtil {
 				// dirContext.modifyAttributes(populatedSearch, mods);
 			}
 		} catch (Exception e) {
+			log.error(e.getMessage().concat("\n failed to add sharedToken to ldap entry"));
 			throw new IMASTException(e.getMessage().concat(
 					"\n failed to save attribute to ldap entry"), e.getCause());
-
 		}
 
 	}
@@ -119,7 +119,7 @@ public class LdapUtil {
 	private InitialDirContext initConnection(Properties properties)
 			throws IMASTException {
 
-		log.info("start initiating a Ldap connection");
+		log.info("initiating a Ldap connection ...");
 
 		InitialDirContext context = null;
 		SSLSocketFactory sslsf;
@@ -140,11 +140,12 @@ public class LdapUtil {
 				String backupAuthType = properties
 						.getProperty(Context.SECURITY_AUTHENTICATION);
 				properties.setProperty(Context.SECURITY_AUTHENTICATION, "NONE");
+				log.debug("before starting TLS : " + properties.toString());
 				log.debug("initiate ldap context with the env: ");
 				log.debug(properties.toString());
 				context = new InitialLdapContext(properties, null);
 
-				log.debug("config tls context ...");
+				log.debug("configuring tls context ...");
 				SSLContext sslc;
 				sslc = SSLContext.getInstance("TLS");
 				sslc.init(new KeyManager[] { null }, null, new SecureRandom());
@@ -152,21 +153,23 @@ public class LdapUtil {
 
 				StartTlsResponse tls = (StartTlsResponse) ((LdapContext) context)
 						.extendedOperation(new StartTlsRequest());
-				log.debug("start tls negotiation ...");
+				log.debug("starting tls negotiation ...");
 				tls.negotiate(sslsf);
 
 				if (useExternalAuth) {
 					context.addToEnvironment(Context.SECURITY_AUTHENTICATION,
 							"EXTERNAL");
 				} else {
-					log.debug("bind ...");
+					log.debug("binding ...");
 					properties.setProperty(Context.SECURITY_AUTHENTICATION,
 							backupAuthType);
+					log.debug("after starting " + properties.toString());
 					context
 							.addToEnvironment(
 									Context.SECURITY_AUTHENTICATION,
 									properties
 											.getProperty(Context.SECURITY_AUTHENTICATION));
+					
 				}
 
 			} else {
@@ -187,7 +190,7 @@ public class LdapUtil {
 			throws IMASTException {
 		// Properties properties = new Properties(System.getProperties());
 		
-		log.info("start setting up ldap context environment");
+		log.info("setting up ldap context environment");
 		Properties properties = new Properties();
 
 		if (ldapRawProp == null || ldapRawProp.isEmpty()) {
@@ -257,7 +260,7 @@ public class LdapUtil {
 	private Element getLdapConfig(String connectorID, String attributeResolver)
 			throws IMASTException {
 		
-		log.info("start getting ldap config from attribute resolver file");
+		log.info("getting ldap config from attribute resolver file");
 
 		Element elem = null;
 
