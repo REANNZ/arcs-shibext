@@ -103,7 +103,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			ShibbolethResolutionContext resolutionContext)
 			throws AttributeResolutionException {
 
-		log.info("SharedTokenDataConnector.resolve( ) is called ...");
+		log.info("starting SharedTokenDataConnector.resolve( ) ...");
 
 		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
 		try {
@@ -111,12 +111,14 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					resolutionContext, STORED_ATTRIBUTE_NAME);
 			String sharedToken = null;
 			if (col.size() < 1) {
-				log.info("sharedToken is not existing, will generate a new one.");
+				log
+						.info("sharedToken is not existing, will generate a new one.");
 				sharedToken = getSharedToken(resolutionContext);
 				if (getStoreLdap())
 					storeSharedToken(resolutionContext, sharedToken);
 			} else {
-				log.info("sharedToken is existing, will not generate a new one.");
+				log
+						.info("sharedToken is existing, will not generate a new one.");
 				sharedToken = col.iterator().next().toString();
 			}
 			BasicAttribute<String> attribute = new BasicAttribute<String>();
@@ -205,14 +207,17 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			ShibbolethResolutionContext resolutionContext, String localId,
 			byte[] salt) throws AttributeResolutionException {
 		String persistentId;
+		log.info("creating a sharedToken ...");
 		try {
 			String localEntityId = resolutionContext
 					.getAttributeRequestContext().getLocalEntityId();
 			String globalUniqueID = localId + localEntityId + new String(salt);
+			log.info("the globalUniqueID : " + globalUniqueID);
 			byte[] hashValue = DigestUtils.sha(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
 			persistentId = this.replace(persistentId);
+			log.info("the created sharedToken: " + persistentId);
 		} catch (Exception e) {
 			log.error("\n failed to create the sharedToken. ");
 			throw new AttributeResolutionException(e.getMessage().concat(
@@ -261,7 +266,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	private String getLocalId(ShibbolethResolutionContext resolutionContext)
 			throws AttributeResolutionException {
 
-		log.info("gets local ID components ...");
+		log.info("gets local ID ...");
 
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 
