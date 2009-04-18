@@ -190,7 +190,7 @@ public class LdapUtil {
 	private Properties buildLdapProperties(HashMap<String, String> ldapRawProp)
 			throws IMASTException {
 		// Properties properties = new Properties(System.getProperties());
-		
+
 		log.info("setting up ldap context environment");
 		Properties properties = new Properties();
 
@@ -205,12 +205,9 @@ public class LdapUtil {
 					: ldapRawProp.get("authenticationType");
 			String secPrincipal = ldapRawProp.get("principal");
 			String pricipalCre = ldapRawProp.get("principalCredential");
-			boolean useStartTLS = false;
 			log.debug("useStartTLS : ..... " + ldapRawProp.get("useStartTLS"));
-			if(ldapRawProp.get("useStartTLS").trim() == "true")
-				useStartTLS = true;			
-			//boolean useStartTLS = ldapRawProp.get("useStartTLS").trim() == "true" ? true
-			//		: false;
+			boolean useStartTLS = ldapRawProp.get("useStartTLS").trim().equals(
+					"true") ? true : false;
 			properties.put(Context.INITIAL_CONTEXT_FACTORY,
 					"com.sun.jndi.ldap.LdapCtxFactory");
 			properties.put(Context.PROVIDER_URL, providerUrl);
