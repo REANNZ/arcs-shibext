@@ -204,7 +204,7 @@ public class LdapUtil {
 					: ldapRawProp.get("authenticationType");
 			String secPrincipal = ldapRawProp.get("principal");
 			String pricipalCre = ldapRawProp.get("principalCredential");
-			boolean useStartTLS = ldapRawProp.get("useStartTLS") == "true" ? true
+			boolean useStartTLS = ldapRawProp.get("useStartTLS").trim() == "true" ? true
 					: false;
 
 			properties.put(Context.INITIAL_CONTEXT_FACTORY,
