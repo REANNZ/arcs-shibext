@@ -120,7 +120,7 @@ public class LdapUtil {
 	private InitialDirContext initConnection(Properties properties)
 			throws IMASTException {
 
-		log.info("initiating a Ldap connection ...");
+		log.info("calling initConnection() ...");
 
 		InitialDirContext context = null;
 		SSLSocketFactory sslsf;
@@ -130,23 +130,23 @@ public class LdapUtil {
 		try {
 
 			if (useStartTLS) {
-				log.info("use startTls");
+				log.info("useStartTLS is true");
 				if ("EXTERNAL".equals(properties
 						.getProperty(Context.SECURITY_AUTHENTICATION))) {
 					log.info("use EXTERNAL authentication");
 					useExternalAuth = true;
 					properties.remove(Context.SECURITY_AUTHENTICATION);
 				}
+				log.info("setting SECURITY_AUTHENTICATION to NONE before starting TLS");
 
 				String backupAuthType = properties
 						.getProperty(Context.SECURITY_AUTHENTICATION);
 				properties.setProperty(Context.SECURITY_AUTHENTICATION, "NONE");
-				log.debug("before starting TLS : " + properties.toString());
-				log.debug("initiate ldap context with the env: ");
-				log.debug(properties.toString());
+
+				log.info("initiating ldap context without bind: " + properties.toString());
 				context = new InitialLdapContext(properties, null);
 
-				log.debug("configuring tls context ...");
+				log.info("creating tls context ...");
 				SSLContext sslc;
 				sslc = SSLContext.getInstance("TLS");
 				sslc.init(new KeyManager[] { null }, null, new SecureRandom());
@@ -154,8 +154,9 @@ public class LdapUtil {
 
 				StartTlsResponse tls = (StartTlsResponse) ((LdapContext) context)
 						.extendedOperation(new StartTlsRequest());
-				log.debug("starting tls negotiation ...");
+				log.info("tls negotiating ...");
 				tls.negotiate(sslsf);
+				log.info("tls negotiating successful ...");
 
 				if (useExternalAuth) {
 					context.addToEnvironment(Context.SECURITY_AUTHENTICATION,
@@ -205,7 +206,6 @@ public class LdapUtil {
 					: ldapRawProp.get("authenticationType");
 			String secPrincipal = ldapRawProp.get("principal");
 			String pricipalCre = ldapRawProp.get("principalCredential");
-			log.debug("useStartTLS : ..... " + ldapRawProp.get("useStartTLS"));
 			boolean useStartTLS = ldapRawProp.get("useStartTLS").trim().equals(
 					"true") ? true : false;
 			properties.put(Context.INITIAL_CONTEXT_FACTORY,
