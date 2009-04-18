@@ -206,6 +206,7 @@ public class LdapUtil {
 			String secPrincipal = ldapRawProp.get("principal");
 			String pricipalCre = ldapRawProp.get("principalCredential");
 			boolean useStartTLS = false;
+			log.debug("useStartTLS : ..... " + ldapRawProp.get("useStartTLS"));
 			if(ldapRawProp.get("useStartTLS").trim() == "true")
 				useStartTLS = true;			
 			//boolean useStartTLS = ldapRawProp.get("useStartTLS").trim() == "true" ? true
