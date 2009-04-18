@@ -249,6 +249,8 @@ public class LdapUtil {
 			ldapRawProperties.put("filterTemplate", ldapConfig
 					.getElementsByTagName("FilterTemplate").item(0)
 					.getTextContent().trim());
+			
+			log.debug("ldapRowProperties " + ldapRawProperties);
 		} catch (Exception e) {
 			
 			throw new IMASTException(e.getMessage(),e.getCause());
