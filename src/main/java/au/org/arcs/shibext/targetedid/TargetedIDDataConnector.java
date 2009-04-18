@@ -201,8 +201,8 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 					.getAttributeRequestContext().getInboundMessageIssuer();
 			String globalUniqueID = localId + localEntityID + peerEntityID
 					+ new String(salt);
-			log.info("the triple of user/IdP/SP : " + localId + " / "
-					+ localEntityID + " / " + peerEntityID);
+			log.info("the uniqueID (user/IdP/SP/salt) : " + localId + " / "
+					+ localEntityID + " / " + peerEntityID + " / " + new String(salt));
 			byte[] hashValue = DigestUtils.sha(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			targetedID = new String(encodedValue);

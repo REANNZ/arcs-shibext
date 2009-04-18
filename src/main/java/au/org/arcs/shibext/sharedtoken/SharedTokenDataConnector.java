@@ -214,7 +214,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			String localEntityId = resolutionContext
 					.getAttributeRequestContext().getLocalEntityId();
 			String globalUniqueID = localId + localEntityId + new String(salt);
-			log.info("the globalUniqueID (user/idp/salt): " + globalUniqueID);
+			log.info("the globalUniqueID (user/idp/salt): " + localId + " / " + localEntityId + " / " + new String(salt));
 			byte[] hashValue = DigestUtils.sha(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
