@@ -56,12 +56,12 @@ public class LdapUtil {
 		} catch (IOException e) {
 			throw new IMASTException(e.getMessage().concat("\n couldn't load ")
 					.concat(PROPERTIES_FILE).concat(" file"), e.getCause());
-		} 
+		}
 	}
 
 	public void saveAttribute(String attributeName, String attributeValue,
 			String dataConnectorID, String principalName) throws IMASTException {
-		
+
 		log.info("storing sharedToken to Ldap ...");
 
 		log.info("attributeName: " + attributeName);
@@ -92,7 +92,7 @@ public class LdapUtil {
 
 			Attribute mod0 = new BasicAttribute(attributeName, attributeValue);
 			ModificationItem[] mods = new ModificationItem[1];
-			
+
 			log.info("adding sharedToken to ldap entry");
 
 			mods[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod0);
@@ -109,7 +109,8 @@ public class LdapUtil {
 				// dirContext.modifyAttributes(populatedSearch, mods);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage().concat("\n failed to add sharedToken to ldap entry"));
+			log.error(e.getMessage().concat(
+					"\n failed to add sharedToken to ldap entry"));
 			throw new IMASTException(e.getMessage().concat(
 					"\n failed to save attribute to ldap entry"), e.getCause());
 		}
@@ -169,7 +170,7 @@ public class LdapUtil {
 									Context.SECURITY_AUTHENTICATION,
 									properties
 											.getProperty(Context.SECURITY_AUTHENTICATION));
-					
+
 				}
 
 			} else {
@@ -204,9 +205,11 @@ public class LdapUtil {
 					: ldapRawProp.get("authenticationType");
 			String secPrincipal = ldapRawProp.get("principal");
 			String pricipalCre = ldapRawProp.get("principalCredential");
-			boolean useStartTLS = ldapRawProp.get("useStartTLS").trim() == "true" ? true
-					: false;
-
+			boolean useStartTLS = false;
+			if(ldapRawProp.get("useStartTLS").trim() == "true")
+				useStartTLS = true;			
+			//boolean useStartTLS = ldapRawProp.get("useStartTLS").trim() == "true" ? true
+			//		: false;
 			properties.put(Context.INITIAL_CONTEXT_FACTORY,
 					"com.sun.jndi.ldap.LdapCtxFactory");
 			properties.put(Context.PROVIDER_URL, providerUrl);
@@ -249,11 +252,11 @@ public class LdapUtil {
 			ldapRawProperties.put("filterTemplate", ldapConfig
 					.getElementsByTagName("FilterTemplate").item(0)
 					.getTextContent().trim());
-			
+
 			log.debug("ldapRowProperties " + ldapRawProperties);
 		} catch (Exception e) {
-			
-			throw new IMASTException(e.getMessage(),e.getCause());
+
+			throw new IMASTException(e.getMessage(), e.getCause());
 		}
 		return ldapRawProperties;
 
@@ -261,7 +264,7 @@ public class LdapUtil {
 
 	private Element getLdapConfig(String connectorID, String attributeResolver)
 			throws IMASTException {
-		
+
 		log.info("getting ldap config from attribute resolver file");
 
 		Element elem = null;
