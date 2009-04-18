@@ -166,6 +166,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 	private void storeSharedToken(
 			ShibbolethResolutionContext resolutionContext, String sharedToken) {
+		
+		log.info("calling storeSharedToken() ...");
 
 		try {
 			String principalName = resolutionContext
@@ -230,6 +232,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	private String replace(String persistentId) {
 		// begin = convert non-alphanum chars in base64 to alphanum
 		// (/+=)
+		log.info("calling replace() ...");
 		if (persistentId.contains("/") || persistentId.contains("+")
 				|| persistentId.contains("=")) {
 			String aepst;
