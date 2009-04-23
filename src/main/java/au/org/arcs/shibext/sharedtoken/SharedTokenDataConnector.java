@@ -168,7 +168,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 
 	private void storeSharedToken(
-			ShibbolethResolutionContext resolutionContext, String sharedToken) {
+			ShibbolethResolutionContext resolutionContext, String sharedToken)
+			throws IMASTException {
 
 		log.info("calling storeSharedToken() ...");
 
@@ -176,19 +177,16 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			String principalName = resolutionContext
 					.getAttributeRequestContext().getPrincipalName();
 
-			try {
-				(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME,
-						sharedToken, getDependencyIds().get(0), principalName);
-			} catch (IMASTException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				log.error("failed to store sharedToken to Ldap");
-			}
+			(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME, sharedToken,
+					getDependencyIds().get(0), principalName);
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			e.printStackTrace();
 			log.error(e.getMessage().concat(
 					"\n failed to store sharedToken to Ldap. "));
+			throw new IMASTException(e.getMessage().concat(
+					"\n failed to save attribute to ldap entry"), e.getCause());
+
 		}
 	}
 
