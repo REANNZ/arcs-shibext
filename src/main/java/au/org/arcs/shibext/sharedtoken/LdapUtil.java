@@ -70,9 +70,25 @@ public class LdapUtil {
 		log.info("principalName " + principalName);
 
 		try {
+			
+			if(shareTokenProperties == null || shareTokenProperties.isEmpty()){
+				throw new IMASTException("failed to get properties file ");
+			}
 
 			String attributeResolver = shareTokenProperties
 					.getProperty("ATTRIBUTE_RESOLVER");
+			String idpHome = System.getenv("IDP_HOME");
+			
+			if(idpHome == null || idpHome.trim().equals("")){
+				idpHome = shareTokenProperties.getProperty("DEFAULT_IDP_HOME");
+			}
+			
+			if(idpHome != null && attributeResolver != null){
+			attributeResolver = attributeResolver.replace("$IDP_HOME", idpHome);
+			}else{
+				throw new IMASTException("failed to get attribute resolver file");
+
+			}
 
 			Element ldapConf = getLdapConfig(dataConnectorID, attributeResolver);
 			HashMap<String, String> ldapRawProp = getLdapRawProperties(ldapConf);
