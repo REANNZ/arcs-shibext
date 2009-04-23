@@ -70,24 +70,28 @@ public class LdapUtil {
 		log.info("principalName " + principalName);
 
 		try {
-			
-			if(shareTokenProperties == null || shareTokenProperties.isEmpty()){
+
+			if (shareTokenProperties == null || shareTokenProperties.isEmpty()) {
 				throw new IMASTException("failed to get properties file ");
 			}
 
 			String attributeResolver = shareTokenProperties
 					.getProperty("ATTRIBUTE_RESOLVER");
 			String idpHome = System.getenv("IDP_HOME");
-			
-			if(idpHome == null || idpHome.trim().equals("")){
-				idpHome = shareTokenProperties.getProperty("DEFAULT_IDP_HOME");
-			}
-			
-			if(idpHome != null && attributeResolver != null){
-			attributeResolver = attributeResolver.replace("$IDP_HOME", idpHome);
-			}else{
-				throw new IMASTException("failed to get attribute resolver file");
 
+			if (idpHome == null || idpHome.trim().equals("")) {
+				idpHome = shareTokenProperties.getProperty("DEFAULT_IDP_HOME");
+				log
+						.warn("couldn't get IDP_HOME from system env. use defaut instead : "
+								+ idpHome);
+			}
+
+			if (idpHome != null && attributeResolver != null) {
+				attributeResolver = attributeResolver.replace("$IDP_HOME",
+						idpHome);
+			} else {
+				throw new IMASTException(
+						"failed to get attribute resolver file");
 			}
 
 			Element ldapConf = getLdapConfig(dataConnectorID, attributeResolver);
@@ -98,11 +102,12 @@ public class LdapUtil {
 			String searchFilterSpec = shareTokenProperties
 					.getProperty("SEARCH_FILTER_SPEC");
 
-			String searchFilter = searchFilterSpec
-					.replace("{0}", principalName);
-			if (searchFilterSpec == null || searchFilterSpec.equals("")) {
+			String searchFilter = null;
+			if (searchFilterSpec == null || searchFilterSpec.equals(""))
 				throw new IMASTException("couldn't find search filter spec");
-			} else {
+			else {
+				searchFilter = searchFilterSpec.replace("{0}",
+						principalName);
 				log.info("ldap search filter : " + searchFilter);
 			}
 
@@ -153,13 +158,15 @@ public class LdapUtil {
 					useExternalAuth = true;
 					properties.remove(Context.SECURITY_AUTHENTICATION);
 				}
-				log.info("setting SECURITY_AUTHENTICATION to NONE before starting TLS");
+				log
+						.info("setting SECURITY_AUTHENTICATION to NONE before starting TLS");
 
 				String backupAuthType = properties
 						.getProperty(Context.SECURITY_AUTHENTICATION);
 				properties.setProperty(Context.SECURITY_AUTHENTICATION, "NONE");
 
-				log.info("initiating ldap context without bind: " + properties.toString());
+				log.info("initiating ldap context without bind: "
+						+ properties.toString());
 				context = new InitialLdapContext(properties, null);
 
 				log.info("creating tls context ...");
