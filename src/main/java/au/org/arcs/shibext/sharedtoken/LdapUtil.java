@@ -118,9 +118,9 @@ public class LdapUtil {
 			log.info("adding sharedToken to ldap entry");
 
 			mods[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod0);
-			log.info("add successfully");
 			try {
 				context.modifyAttributes(searchFilter, mods);
+				log.info("add successfully");
 			} catch (NamingException e) {
 				e.printStackTrace();
 				throw new IMASTException(e.getMessage().concat(
@@ -262,6 +262,8 @@ public class LdapUtil {
 		try {
 			String multiLdap = ldapConfig.getAttribute("ldapURL");
 			StringTokenizer st = new StringTokenizer(multiLdap);
+			if(st.countTokens() > 1)
+				log.warn("You set multiple Ldap URLs, only first one will be used in this version");
 			String ldapURL = st.nextToken();
 			
 			ldapRawProperties
