@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -259,8 +260,12 @@ public class LdapUtil {
 
 		HashMap<String, String> ldapRawProperties = new HashMap<String, String>();
 		try {
+			String multiLdap = ldapConfig.getAttribute("ldapURL");
+			StringTokenizer st = new StringTokenizer(multiLdap);
+			String ldapURL = st.nextToken();
+			
 			ldapRawProperties
-					.put("ldapURL", ldapConfig.getAttribute("ldapURL"));
+					.put("ldapURL", ldapURL);
 			ldapRawProperties.put("baseDN", ldapConfig.getAttribute("baseDN"));
 			ldapRawProperties.put("authenticationType", ldapConfig
 					.getAttribute("authenticationType"));
