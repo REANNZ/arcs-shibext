@@ -22,8 +22,15 @@ public class SharedTokenDataConnectorBeanFactory extends
 	 */
 	private String sourceAttribute;
 
-	/** Salt used when computing the sharedToken. */
+	/** 
+	 * Salt used when computing the sharedToken. 
+	 */
 	private byte[] salt;
+
+	/** 
+	 * IdP identifier used when computing the sharedToken. 
+	 */
+	private String idpIdentifier;
 
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
@@ -100,7 +107,7 @@ public class SharedTokenDataConnectorBeanFactory extends
 	protected Object createInstance() throws Exception {
 		SharedTokenDataConnector connector = new SharedTokenDataConnector(
 				getGeneratedAttribute(), getSourceAttribute(), getSalt(),
-				getStoreLdap());
+				getStoreLdap(), getIdpIdentifier());
 		populateDataConnector(connector);
 		return connector;
 	}
@@ -118,6 +125,20 @@ public class SharedTokenDataConnectorBeanFactory extends
 	 */
 	public void setStoreLdap(boolean storeLdap) {
 		this.storeLdap = storeLdap;
+	}
+
+	/**
+	 * @return the idpIdentifier
+	 */
+	public String getIdpIdentifier() {
+		return idpIdentifier;
+	}
+
+	/**
+	 * @param idpIdentifier the idpIdentifier to set
+	 */
+	public void setIdpIdentifier(String idpIdentifier) {
+		this.idpIdentifier = idpIdentifier;
 	}
 
 }

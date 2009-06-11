@@ -51,6 +51,11 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 					"auEduPersonSharedToken");
 		}
 
+		if (pluginConfig.hasAttributeNS(null, "idpIdentifier")) {
+			pluginBuilder.addPropertyValue("idpIdentifier", pluginConfig
+					.getAttributeNS(null, "idpIdentifier"));
+		} 
+
 		if (pluginConfig.hasAttributeNS(null, "storeLdap")) {
 			pluginBuilder.addPropertyValue("storeLdap", XMLHelper
 					.getAttributeValueAsBoolean(pluginConfig

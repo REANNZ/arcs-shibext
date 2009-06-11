@@ -37,6 +37,11 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	private String generatedAttribute;
 
 	/**
+	 * IdP identifier used when computing the sharedToken.
+	 */
+	private String idpIdentifier;
+
+	/**
 	 * ID of the attribute whose first value is used when generating the
 	 * computed ID.
 	 */
@@ -62,7 +67,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 *            Whether to store the sharedToken to Ldap
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
-			String sourceAttributeId, byte[] idSalt, boolean storeLdap) {
+			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
+			String idpIdentifier) {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
@@ -83,6 +89,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 						"Provided salt must be at least 16 bytes in size.");
 			}
 			salt = idSalt;
+
+			this.idpIdentifier = idpIdentifier;
 
 			this.storeLdap = storeLdap;
 		} catch (Exception e) {
@@ -212,8 +220,13 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 		String persistentId;
 		log.info("creating a sharedToken ...");
 		try {
-			String localEntityId = resolutionContext
-					.getAttributeRequestContext().getLocalEntityId();
+			String localEntityId = null;
+			if (this.idpIdentifier == null) {
+				localEntityId = resolutionContext.getAttributeRequestContext()
+						.getLocalEntityId();
+			} else {
+				localEntityId = idpIdentifier;
+			}
 			String globalUniqueID = localId + localEntityId + new String(salt);
 			log.info("the globalUniqueID (user/idp/salt): " + localId + " / "
 					+ localEntityId + " / " + new String(salt));
@@ -347,6 +360,21 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 	public boolean getStoreLdap() {
 		return storeLdap;
+	}
+
+	/**
+	 * @return the idpIdentifier
+	 */
+	public String getIdpIdentifier() {
+		return idpIdentifier;
+	}
+
+	/**
+	 * @param idpIdentifier
+	 *            the idpIdentifier to set
+	 */
+	public void setIdpIdentifier(String idpIdentifier) {
+		this.idpIdentifier = idpIdentifier;
 	}
 
 }

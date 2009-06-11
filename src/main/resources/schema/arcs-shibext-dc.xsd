@@ -63,6 +63,14 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="idpIdentifier" type="string">
+					<annotation>
+						<documentation>
+							IdP indentifier, used in the computed ID.
+							Defaults to IdP entityID.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
