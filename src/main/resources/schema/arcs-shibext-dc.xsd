@@ -81,7 +81,7 @@
 					</annotation>
 				</attribute>
 
-				<choice minOccurs=0>
+				<choice minOccurs="0">
 					<element ref="DatabaseConnection">
 						<annotation>
 							<documentation>
