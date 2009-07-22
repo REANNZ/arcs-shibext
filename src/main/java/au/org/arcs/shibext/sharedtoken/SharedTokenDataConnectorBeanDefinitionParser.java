@@ -81,7 +81,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeDatabase")));
 		} else {
-			pluginBuilder.addPropertyValue("storeLdap", true);
+			pluginBuilder.addPropertyValue("storeDatabase", true);
 		}
 
 		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
@@ -91,7 +91,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 		DataSource connectionSource = processConnectionManagement(pluginId,
 				pluginConfigChildren, pluginBuilder);
-		pluginBuilder.addPropertyValue("datasource", connectionSource);
+		pluginBuilder.addPropertyValue("dataSource", connectionSource);
 
 	}
 

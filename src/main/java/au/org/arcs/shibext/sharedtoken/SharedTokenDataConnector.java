@@ -6,6 +6,8 @@ package au.org.arcs.shibext.sharedtoken;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opensaml.xml.util.DatatypeHelper;
@@ -18,6 +20,7 @@ import edu.internet2.middleware.shibboleth.common.attribute.provider.BasicAttrib
 import edu.internet2.middleware.shibboleth.common.attribute.resolver.AttributeResolutionException;
 import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.ShibbolethResolutionContext;
 import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.dataConnector.BaseDataConnector;
+import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.dataConnector.StoredIDStore;
 
 /**
  * @author Damien Chen
@@ -53,6 +56,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
 
+	/** Whether to store the sharedToken to database */
+	private boolean storeDatabase;
+
+	/** SharedToken data store. */
+	private SharedTokenStore stStore;
+
 	/**
 	 * Constructor.
 	 * 
@@ -68,7 +77,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
 			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
-			String idpIdentifier) {
+			String idpIdentifier, boolean storeDatabase, DataSource source) {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
@@ -93,6 +102,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			this.idpIdentifier = idpIdentifier;
 
 			this.storeLdap = storeLdap;
+
+			this.storeDatabase = storeDatabase;
+
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
 			e.printStackTrace();
@@ -114,23 +126,40 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 		log.info("starting SharedTokenDataConnector.resolve( ) ...");
 
 		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
+		String sharedToken = null;
 		try {
-			Collection<Object> col = super.getValuesFromAllDependencies(
-					resolutionContext, STORED_ATTRIBUTE_NAME);
-			String sharedToken = null;
-			if (col.size() < 1) {
+			if (storeDatabase) {
 				log
-						.info("sharedToken is not existing, will generate a new one.");
-				sharedToken = getSharedToken(resolutionContext);
-				if (getStoreLdap())
-					storeSharedToken(resolutionContext, sharedToken);
-				else
+						.debug("storeDatabase is set to true. get SharedToken from database");
+				sharedToken = stStore.getSharedToken();
+				if (sharedToken == null) {
 					log
-							.info("storeLdap is set to false, not to store sharedToken to Ldap");
+							.info("sharedToken does not exist, will generate a new one and store in database.");
+
+					sharedToken = getSharedToken(resolutionContext);
+					stStore.storeSharedToken();
+				} else {
+					log
+							.info("sharedToken exists, will not generate a new one.");
+				}
 			} else {
-				log
-						.info("sharedToken is existing, will not generate a new one.");
-				sharedToken = col.iterator().next().toString();
+				Collection<Object> col = super.getValuesFromAllDependencies(
+						resolutionContext, STORED_ATTRIBUTE_NAME);
+				//
+				if (col.size() < 1) {
+					log
+							.info("sharedToken does not exist, will generate a new one.");
+					sharedToken = getSharedToken(resolutionContext);
+					if (getStoreLdap())
+						storeSharedToken(resolutionContext, sharedToken);
+					else
+						log
+								.info("storeLdap is set to false, not to store sharedToken to Ldap");
+				} else {
+					log
+							.info("sharedToken  exists, will not generate a new one.");
+					sharedToken = col.iterator().next().toString();
+				}
 			}
 			BasicAttribute<String> attribute = new BasicAttribute<String>();
 			attribute.setId(getGeneratedAttributeId());
