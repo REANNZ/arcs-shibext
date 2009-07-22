@@ -75,6 +75,41 @@
 		</complexContent>
 	</complexType>
 
+   <element name="ApplicationManagedConnection" type="ApplicationManagedConnectionType">
+        <annotation>
+            <documentation>
+                Describes a database connection source that is managed by the attribute resolver data connector.
+            </documentation>
+        </annotation>
+    </element>
+    <complexType name="ApplicationManagedConnectionType">
+        <attribute name="jdbcDriver" type="string" use="required">
+            <annotation>
+                <documentation>
+                    This is the full qualified class name of the JDBC driver used to connect to the database.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="jdbcURL" type="string" use="required">
+            <annotation>
+                <documentation>
+                    The JDBC URL for the database. These are usually of the form
+                    jdbc:databaseProduceName:databaseSpecificInformation. For example, jdbc:hsql:mem:MyDatabase
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="jdbcUserName" type="string">
+            <annotation>
+                <documentation>The user name to use while connecting to the database.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="jdbcPassword" type="string">
+            <annotation>
+                <documentation>The password to use while connecting to the database.</documentation>
+            </annotation>
+        </attribute>
+     </complexType>
+
 
 	<complexType name="TargetedID">
 		<annotation>
