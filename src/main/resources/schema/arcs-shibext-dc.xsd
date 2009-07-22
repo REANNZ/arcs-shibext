@@ -75,19 +75,23 @@
 				<attribute name="storeDatabase" type="boolean">
 					<annotation>
 						<documentation>
-							Whether to store the Sharedtoken to the database.
+							Whether to store the Sharedtoken to the
+							database.
 						</documentation>
 					</annotation>
 				</attribute>
 
-				<element ref="DatabaseConnection">
-					<annotation>
-						<documentation>
-							A connection, or pool of connections, to the
-							database managed by the data connector.
-						</documentation>
-					</annotation>
-				</element>
+				<choice minOccurs=0>
+					<element ref="DatabaseConnection">
+						<annotation>
+							<documentation>
+								A connection, or pool of connections, to
+								the database managed by the data
+								connector.
+							</documentation>
+						</annotation>
+					</element>
+				</choice>
 			</extension>
 		</complexContent>
 	</complexType>
