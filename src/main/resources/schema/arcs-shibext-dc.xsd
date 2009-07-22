@@ -66,7 +66,7 @@
 				<attribute name="idpIdentifier" type="string">
 					<annotation>
 						<documentation>
-							IdP indentifier, used in the computed ID.
+							IdP indentifier, used in the SharedToken.
 							Defaults to IdP entityID.
 						</documentation>
 					</annotation>
