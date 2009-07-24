@@ -30,6 +30,18 @@
 		<complexContent>
 			<extension base="resolver:BaseDataConnectorType">
 
+				<choice minOccurs="0">
+					<element ref="arcs:DatabaseConnection">
+						<annotation>
+							<documentation>
+								A connection, or pool of connections, to
+								the database managed by the data
+								connector.
+							</documentation>
+						</annotation>
+					</element>
+				</choice>
+
 				<attribute name="generatedAttributeID" type="string">
 					<annotation>
 						<documentation>
@@ -81,22 +93,11 @@
 					</annotation>
 				</attribute>
 
-				<choice minOccurs="0">
-					<element ref="DatabaseConnection">
-						<annotation>
-							<documentation>
-								A connection, or pool of connections, to
-								the database managed by the data
-								connector.
-							</documentation>
-						</annotation>
-					</element>
-				</choice>
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<element name="DatabaseConnection" type="DatabaseConnectionType">
+	<element name="DatabaseConnection" type="arcs:DatabaseConnectionType">
 		<annotation>
 			<documentation>
 				Describes a database connection source that is managed
