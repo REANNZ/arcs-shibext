@@ -76,18 +76,18 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeLdap", true);
 		}
 
+		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
+				.getAttributeNS(null, "sourceAttributeID"));
+		pluginBuilder.addPropertyValue("salt", pluginConfig.getAttributeNS(
+				null, "salt").getBytes());
+
 		if (pluginConfig.hasAttributeNS(null, "storeDatabase")) {
 			pluginBuilder.addPropertyValue("storeDatabase", XMLHelper
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeDatabase")));
 		} else {
-			pluginBuilder.addPropertyValue("storeDatabase", true);
+			pluginBuilder.addPropertyValue("storeDatabase", false);
 		}
-
-		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
-				.getAttributeNS(null, "sourceAttributeID"));
-		pluginBuilder.addPropertyValue("salt", pluginConfig.getAttributeNS(
-				null, "salt").getBytes());
 
 		DataSource connectionSource = processConnectionManagement(pluginId,
 				pluginConfigChildren, pluginBuilder);
@@ -110,57 +110,81 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	protected DataSource processConnectionManagement(String pluginId,
 			Map<QName, List<Element>> pluginConfigChildren,
 			BeanDefinitionBuilder pluginBuilder) {
-		return buildDatabaseConnection(pluginId, pluginConfigChildren.get(
-				new QName(ARCSDataConnectorNamespaceHandler.NAMESPACE,
-						"DatabaseConnection")).get(0));
+
+		DataSource ds = null;
+
+		try {
+			List<Element> le = pluginConfigChildren.get(new QName(
+					ARCSDataConnectorNamespaceHandler.NAMESPACE,
+					"DatabaseConnection"));
+			if (le != null) {
+				ds = buildDatabaseConnection(
+						pluginId,
+						pluginConfigChildren
+								.get(
+										new QName(
+												ARCSDataConnectorNamespaceHandler.NAMESPACE,
+												"DatabaseConnection")).get(0));
+			} else {
+				log
+						.info("DatabaseConnection element is not set in SharedToken data connector");
+
+			}
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		return ds;
 
 	}
 
 	/**
-	 * Builds a JDBC {@link DataSource} from an ApplicationManagedConnection
-	 * configuration element.
+	 * Builds a JDBC {@link DataSource} from an DatabaseConnection configuration
+	 * element.
 	 * 
 	 * @param pluginId
 	 *            ID of this data connector
-	 * @param amc
-	 *            the application managed configuration element
+	 * @param dbc
+	 *            the DatabaseConnection configuration element
 	 * 
 	 * @return the built data source
 	 */
-	protected DataSource buildDatabaseConnection(String pluginId, Element amc) {
-		ComboPooledDataSource datasource = new ComboPooledDataSource();
-		String driverClass = DatatypeHelper.safeTrim(amc.getAttributeNS(null,
-				"jdbcDriver"));
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		try {
-			classLoader.loadClass(driverClass);
-		} catch (ClassNotFoundException e) {
-			log
-					.error("Unable to create relational database connector, JDBC driver can not be found on the classpath");
-			throw new BeanCreationException(
-					"Unable to create relational database connector, JDBC driver can not be found on the classpath");
-		}
-		try {
-			datasource.setDriverClass(driverClass);
-			datasource.setJdbcUrl(DatatypeHelper.safeTrim(amc.getAttributeNS(
-					null, "jdbcURL")));
-			datasource.setUser(DatatypeHelper.safeTrim(amc.getAttributeNS(null,
-					"jdbcUserName")));
-			datasource.setPassword(DatatypeHelper.safeTrim(amc.getAttributeNS(
-					null, "jdbcPassword")));
+	protected DataSource buildDatabaseConnection(String pluginId, Element dbc) {
+		
+			ComboPooledDataSource datasource = new ComboPooledDataSource();
+			String driverClass = DatatypeHelper.safeTrim(dbc.getAttributeNS(
+					null, "jdbcDriver"));
+			ClassLoader classLoader = this.getClass().getClassLoader();
+			try {
+				classLoader.loadClass(driverClass);
+			} catch (ClassNotFoundException e) {
+				log
+						.error("Unable to create relational database connector, JDBC driver can not be found on the classpath");
+				throw new BeanCreationException(
+						"Unable to create relational database connector, JDBC driver can not be found on the classpath");
+			}
+			try {
+				datasource.setDriverClass(driverClass);
+				datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc
+						.getAttributeNS(null, "jdbcURL")));
+				datasource.setUser(DatatypeHelper.safeTrim(dbc.getAttributeNS(
+						null, "jdbcUserName")));
+				datasource.setPassword(DatatypeHelper.safeTrim(dbc
+						.getAttributeNS(null, "jdbcPassword")));
 
-			log
-					.debug(
-							"Created application managed data source for data connector {}",
-							pluginId);
-			return datasource;
-		} catch (PropertyVetoException e) {
-			log
-					.error(
-							"Unable to create data source for data connector {} with JDBC driver class {}",
-							pluginId, driverClass);
-			return null;
-		}
+				log
+						.debug(
+								"Created data source for data connector {}",
+								pluginId);
+				return datasource;
+			} catch (PropertyVetoException e) {
+				log
+						.error(
+								"Unable to create data source for data connector {} with JDBC driver class {}",
+								pluginId, driverClass);
+				return null;
+			}
+		
 	}
 
 }

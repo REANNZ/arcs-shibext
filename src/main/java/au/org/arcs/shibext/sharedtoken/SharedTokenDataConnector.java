@@ -61,9 +61,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 	/** SharedToken data store. */
 	private SharedTokenStore stStore;
-	
-	private static String PRIMARY_KEY = "uid";
 
+	private static String PRIMARY_KEY = "uid";
 
 	/**
 	 * Constructor.
@@ -107,18 +106,22 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			this.storeLdap = storeLdap;
 
 			this.storeDatabase = storeDatabase;
-			
-			if(storeDatabase){
-				if(source != null)
-				stStore = new SharedTokenStore(source);
-			}else{
-				throw new IllegalArgumentException("DataSource should not be null");
+
+			if (storeDatabase) {
+				if (source != null) {
+					stStore = new SharedTokenStore(source);
+				} else {
+					log.error("DataSource should not be null");
+					throw new IllegalArgumentException(
+							"DataSource should not be null");
+				}
 			}
 
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
 			e.printStackTrace();
-			log.error(e.getMessage() + "\n failed to construct SharedTokenDataConnector object");
+			log.error(e.getMessage()
+					+ "\n failed to construct SharedTokenDataConnector object");
 		}
 
 	}
@@ -136,18 +139,23 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 		log.info("starting SharedTokenDataConnector.resolve( ) ...");
 
 		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
-		
+
 		String sharedToken = null;
 		try {
 			if (storeDatabase) {
 				log
-				.debug("storeDatabase is set to true. get SharedToken from database");
+						.info("storeDatabase = true. Try to get SharedToken from database");
 				Collection<Object> colUid = super.getValuesFromAllDependencies(
 						resolutionContext, PRIMARY_KEY);
+
+				String uid = (String) colUid.iterator().next();
 				
-				String uid = (String)colUid.iterator().next();
-				
+				if(stStore != null){
 				sharedToken = stStore.getSharedToken(uid);
+				}else{
+					log.error("SharedTokenStore is null");
+					throw new IMASTException("SharedTokenStore is null");
+				}
 				if (sharedToken == null) {
 					log
 							.info("sharedToken does not exist, will generate a new one and store in database.");
@@ -159,6 +167,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 							.info("sharedToken exists, will not generate a new one.");
 				}
 			} else {
+				log
+				.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
 				Collection<Object> col = super.getValuesFromAllDependencies(
 						resolutionContext, STORED_ATTRIBUTE_NAME);
 				//
@@ -166,11 +176,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					log
 							.info("sharedToken does not exist, will generate a new one.");
 					sharedToken = getSharedToken(resolutionContext);
-					if (getStoreLdap())
+					if (getStoreLdap()){
+						log.debug("storeLdap=true, will store the SharedToken in LDAP.");
 						storeSharedToken(resolutionContext, sharedToken);
-					else
+					}else
 						log
-								.info("storeLdap is set to false, not to store sharedToken to Ldap");
+								.info("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
 					log
 							.info("sharedToken  exists, will not generate a new one.");
@@ -183,8 +194,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			attributes.put(attribute.getId(), attribute);
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
-			log.error("failed to resolve " + STORED_ATTRIBUTE_NAME);
-			e.printStackTrace();
+			log.error(e.getMessage());
+			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME);
+			//e.printStackTrace();
 		}
 		return attributes;
 	}
