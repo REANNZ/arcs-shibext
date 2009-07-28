@@ -30,8 +30,11 @@
 		<complexContent>
 			<extension base="resolver:BaseDataConnectorType">
 
-				<choice minOccurs="0">
-					<element ref="arcs:DatabaseConnection">
+
+
+				<sequence>
+					<element ref="arcs:DatabaseConnection"
+						minOccurs="0">
 						<annotation>
 							<documentation>
 								A connection, or pool of connections, to
@@ -40,7 +43,8 @@
 							</documentation>
 						</annotation>
 					</element>
-				</choice>
+				</sequence>
+
 
 				<attribute name="generatedAttributeID" type="string">
 					<annotation>
@@ -97,7 +101,8 @@
 		</complexContent>
 	</complexType>
 
-	<element name="DatabaseConnection" type="arcs:DatabaseConnectionType">
+	<element name="DatabaseConnection"
+		type="arcs:DatabaseConnectionType">
 		<annotation>
 			<documentation>
 				Describes a database connection source that is managed
