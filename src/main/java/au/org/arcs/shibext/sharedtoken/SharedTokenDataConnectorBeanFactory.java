@@ -33,6 +33,11 @@ public class SharedTokenDataConnectorBeanFactory extends
 	 */
 	private String idpIdentifier;
 
+	/**
+	 * IdP home directory.
+	 */
+	private String idpHome;
+
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
 
@@ -133,7 +138,7 @@ public class SharedTokenDataConnectorBeanFactory extends
 	protected Object createInstance() throws Exception {
 		SharedTokenDataConnector connector = new SharedTokenDataConnector(
 				getGeneratedAttribute(), getSourceAttribute(), getSalt(),
-				getStoreLdap(), getIdpIdentifier(), getStoreDatabase(),
+				getStoreLdap(), getIdpIdentifier(), getIdpHome(), getStoreDatabase(),
 				getDataSource());
 		populateDataConnector(connector);
 		return connector;
@@ -182,6 +187,20 @@ public class SharedTokenDataConnectorBeanFactory extends
 	 */
 	public void setStoreDatabase(boolean storeDatabase) {
 		this.storeDatabase = storeDatabase;
+	}
+
+	/**
+	 * @return the idpHome
+	 */
+	public String getIdpHome() {
+		return idpHome;
+	}
+
+	/**
+	 * @param idpHome the idpHome to set
+	 */
+	public void setIdpHome(String idpHome) {
+		this.idpHome = idpHome;
 	}
 
 }

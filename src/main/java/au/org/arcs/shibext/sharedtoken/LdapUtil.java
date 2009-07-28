@@ -61,7 +61,7 @@ public class LdapUtil {
 	}
 
 	public void saveAttribute(String attributeName, String attributeValue,
-			String dataConnectorID, String principalName) throws IMASTException {
+			String dataConnectorID, String principalName, String idpHome) throws IMASTException {
 
 		log.info("storing sharedToken to Ldap ...");
 
@@ -78,7 +78,7 @@ public class LdapUtil {
 
 			String attributeResolver = shareTokenProperties
 					.getProperty("ATTRIBUTE_RESOLVER");
-			String idpHome = System.getenv("IDP_HOME");
+			//String idpHome = System.getenv("IDP_HOME");
 
 			if (idpHome == null || idpHome.trim().equals("")) {
 				idpHome = shareTokenProperties.getProperty("DEFAULT_IDP_HOME");

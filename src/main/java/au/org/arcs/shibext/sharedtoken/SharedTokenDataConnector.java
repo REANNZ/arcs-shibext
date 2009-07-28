@@ -45,6 +45,11 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	private String idpIdentifier;
 
 	/**
+	 * IdP home directory used when getting the IdP's configuration.
+	 */
+	private String idpHome;
+
+	/**
 	 * ID of the attribute whose first value is used when generating the
 	 * computed ID.
 	 */
@@ -62,6 +67,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	/** SharedToken data store. */
 	private SharedTokenStore stStore;
 
+	/** Primary key in SharedToken database */
 	private static String PRIMARY_KEY = "uid";
 
 	/**
@@ -79,7 +85,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
 			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
-			String idpIdentifier, boolean storeDatabase, DataSource source) {
+			String idpIdentifier, String idpHome, boolean storeDatabase,
+			DataSource source) {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
@@ -149,10 +156,10 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 						resolutionContext, PRIMARY_KEY);
 
 				String uid = (String) colUid.iterator().next();
-				
-				if(stStore != null){
-				sharedToken = stStore.getSharedToken(uid);
-				}else{
+
+				if (stStore != null) {
+					sharedToken = stStore.getSharedToken(uid);
+				} else {
 					log.error("SharedTokenStore is null");
 					throw new IMASTException("SharedTokenStore is null");
 				}
@@ -168,7 +175,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 				}
 			} else {
 				log
-				.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
+						.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
 				Collection<Object> col = super.getValuesFromAllDependencies(
 						resolutionContext, STORED_ATTRIBUTE_NAME);
 				//
@@ -176,10 +183,11 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					log
 							.info("sharedToken does not exist, will generate a new one.");
 					sharedToken = getSharedToken(resolutionContext);
-					if (getStoreLdap()){
-						log.debug("storeLdap=true, will store the SharedToken in LDAP.");
+					if (getStoreLdap()) {
+						log
+								.debug("storeLdap=true, will store the SharedToken in LDAP.");
 						storeSharedToken(resolutionContext, sharedToken);
-					}else
+					} else
 						log
 								.info("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
@@ -196,7 +204,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			// catch any exception so that the IdP will not screw up.
 			log.error(e.getMessage());
 			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME);
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return attributes;
 	}
@@ -243,7 +251,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					.getAttributeRequestContext().getPrincipalName();
 
 			(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME, sharedToken,
-					getDependencyIds().get(0), principalName);
+					getDependencyIds().get(0), principalName, idpHome);
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			e.printStackTrace();

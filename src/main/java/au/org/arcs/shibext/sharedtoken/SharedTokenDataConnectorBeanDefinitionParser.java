@@ -67,6 +67,10 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("idpIdentifier", pluginConfig
 					.getAttributeNS(null, "idpIdentifier"));
 		}
+		if (pluginConfig.hasAttributeNS(null, "idpHome")) {
+			pluginBuilder.addPropertyValue("idpHome", pluginConfig
+					.getAttributeNS(null, "idpHome"));
+		}
 
 		if (pluginConfig.hasAttributeNS(null, "storeLdap")) {
 			pluginBuilder.addPropertyValue("storeLdap", XMLHelper

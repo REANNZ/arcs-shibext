@@ -29,23 +29,17 @@
 		</annotation>
 		<complexContent>
 			<extension base="resolver:BaseDataConnectorType">
-
-
-
 				<sequence>
 					<element ref="arcs:DatabaseConnection"
 						minOccurs="0">
 						<annotation>
 							<documentation>
-								A connection, or pool of connections, to
-								the database managed by the data
-								connector.
+								A connection to the database managed by
+								the data connector.
 							</documentation>
 						</annotation>
 					</element>
 				</sequence>
-
-
 				<attribute name="generatedAttributeID" type="string">
 					<annotation>
 						<documentation>
@@ -87,7 +81,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
-
+				<attribute name="idpHome" type="string">
+					<annotation>
+						<documentation>
+							The absolute path of IdP home directory.
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="storeDatabase" type="boolean">
 					<annotation>
 						<documentation>
@@ -96,7 +96,6 @@
 						</documentation>
 					</annotation>
 				</attribute>
-
 			</extension>
 		</complexContent>
 	</complexType>
