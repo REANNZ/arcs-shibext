@@ -109,6 +109,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			salt = idSalt;
 
 			this.idpIdentifier = idpIdentifier;
+			
+			this.idpHome = idpHome;
 
 			this.storeLdap = storeLdap;
 

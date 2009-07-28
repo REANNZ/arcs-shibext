@@ -61,7 +61,8 @@ public class LdapUtil {
 	}
 
 	public void saveAttribute(String attributeName, String attributeValue,
-			String dataConnectorID, String principalName, String idpHome) throws IMASTException {
+			String dataConnectorID, String principalName, String idpHome)
+			throws IMASTException {
 
 		log.info("storing sharedToken to Ldap ...");
 
@@ -78,14 +79,44 @@ public class LdapUtil {
 
 			String attributeResolver = shareTokenProperties
 					.getProperty("ATTRIBUTE_RESOLVER");
-			//String idpHome = System.getenv("IDP_HOME");
-
-			if (idpHome == null || idpHome.trim().equals("")) {
-				idpHome = shareTokenProperties.getProperty("DEFAULT_IDP_HOME");
-				log
-						.warn("couldn't get IDP_HOME from system env. use defaut instead : "
-								+ idpHome);
+			
+			
+			if(idpHome != null && !idpHome.trim().equals("")){
+				log.debug("get IDP_HOME from data connector");
+				log.debug("IDP_HOME : " + idpHome);
+			}else{
+				log.debug("couldn't get IDP_HOME from data connector. try to get it from system env");
+				idpHome = System.getenv("IDP_HOME");
+				if(idpHome != null && !idpHome.trim().equals("")){
+					log.debug("IDP_HOME : " + idpHome);
+				}else{
+					log.debug("couldn't get IDP_HOME from system env. try to get it sharedtoken.properties");
+					idpHome = shareTokenProperties
+					.getProperty("DEFAULT_IDP_HOME");
+					if(idpHome != null && !idpHome.trim().equals("")){
+						log.debug("IDP_HOME : " + idpHome);
+					}else{
+						log.error("couldn't get IDP_HOME anywhere");
+					}
+					
+				}
 			}
+
+			/*
+			if (idpHome == null || idpHome.trim().equals("")) {
+				log
+						.debug("couldn't get IDP_HOME from data connector. try to get it from system env");
+				idpHome = System.getenv("IDP_HOME");
+
+				if (idpHome == null || idpHome.trim().equals("")) {
+					idpHome = shareTokenProperties
+							.getProperty("DEFAULT_IDP_HOME");
+					log
+							.debug("couldn't get IDP_HOME from system env. use defaut instead : "
+									+ idpHome);
+				}
+			}
+			*/
 
 			if (idpHome != null && attributeResolver != null) {
 				attributeResolver = attributeResolver.replace("$IDP_HOME",
@@ -107,8 +138,7 @@ public class LdapUtil {
 			if (searchFilterSpec == null || searchFilterSpec.equals(""))
 				throw new IMASTException("couldn't find search filter spec");
 			else {
-				searchFilter = searchFilterSpec.replace("{0}",
-						principalName);
+				searchFilter = searchFilterSpec.replace("{0}", principalName);
 				log.info("ldap search filter : " + searchFilter);
 			}
 
@@ -262,12 +292,12 @@ public class LdapUtil {
 		try {
 			String multiLdap = ldapConfig.getAttribute("ldapURL");
 			StringTokenizer st = new StringTokenizer(multiLdap);
-			if(st.countTokens() > 1)
-				log.warn("You set multiple Ldap URLs, only first one will be used in this version");
+			if (st.countTokens() > 1)
+				log
+						.warn("You set multiple Ldap URLs, only first one will be used in this version");
 			String ldapURL = st.nextToken();
-			
-			ldapRawProperties
-					.put("ldapURL", ldapURL);
+
+			ldapRawProperties.put("ldapURL", ldapURL);
 			ldapRawProperties.put("baseDN", ldapConfig.getAttribute("baseDN"));
 			ldapRawProperties.put("authenticationType", ldapConfig
 					.getAttribute("authenticationType"));
