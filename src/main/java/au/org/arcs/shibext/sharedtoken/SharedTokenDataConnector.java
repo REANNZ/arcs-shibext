@@ -103,8 +103,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			sourceAttribute = sourceAttributeId;
 
 			if (idSalt.length < 16) {
-				throw new IllegalArgumentException(
-						"Provided salt must be at least 16 bytes in size.");
+				log.warn("Provided salt less than 16 bytes in size.");
+				//throw new IllegalArgumentException(
+				//		"Provided salt must be at least 16 bytes in size.");
 			}
 			salt = idSalt;
 
