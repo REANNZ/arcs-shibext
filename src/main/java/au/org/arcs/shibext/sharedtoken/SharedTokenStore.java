@@ -50,13 +50,11 @@ public class SharedTokenStore {
 				rs = st.executeQuery();
 
 				while (rs.next()) {
-					log.debug(rs.getString("sharedToken") + "        "
-							+ rs.getString("sharedToken"));
-
 					sharedToken = rs.getString("sharedToken");
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
+				log.error(e.getMessage());
 				throw new IMASTException(e.getMessage());
 			} finally {
 				try {
@@ -72,6 +70,7 @@ public class SharedTokenStore {
 					+ "\n Failed to get SharedToken from database");
 
 		}
+		log.info("SharedToken : " + sharedToken);
 
 		return sharedToken;
 	}
