@@ -1,0 +1,16 @@
+# Sample database scripts
+
+mysql> create user 'idp_admin'@'localhost' identified by 'idp_admin';
+
+mysql> grant all privileges on *.* to 'idp_admin'@'localhost' with grant option;
+
+$mysql -u idp_admin -p
+
+CREATE DATABASE idp_db;
+
+CREATE TABLE tb_st (
+uid VARCHAR(100) NOT NULL,
+sharedToken VARCHAR(50),
+PRIMARY KEY  (uid)
+);
+
