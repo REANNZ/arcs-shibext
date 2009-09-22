@@ -43,6 +43,11 @@ public class SharedTokenDataConnectorBeanFactory extends
 
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
+	
+	/**
+	 * The primary key name in the database table to index the SharedToken
+	 */
+	private String primaryKeyName;
 
 	/** Datasource used to communicate with database. */
 	private DataSource dataSource;
@@ -139,7 +144,7 @@ public class SharedTokenDataConnectorBeanFactory extends
 		SharedTokenDataConnector connector = new SharedTokenDataConnector(
 				getGeneratedAttribute(), getSourceAttribute(), getSalt(),
 				getStoreLdap(), getIdpIdentifier(), getIdpHome(), getStoreDatabase(),
-				getDataSource());
+				getDataSource(), this.getPrimaryKeyName());
 		populateDataConnector(connector);
 		return connector;
 	}
@@ -203,4 +208,20 @@ public class SharedTokenDataConnectorBeanFactory extends
 		this.idpHome = idpHome;
 	}
 
+	/**
+	 * @return the primaryKeyName
+	 */
+	public String getPrimaryKeyName() {
+		return primaryKeyName;
+	}
+
+	/**
+	 * @param primaryKeyName the primaryKeyName to set
+	 */
+	public void setPrimaryKeyName(String primaryKeyName) {
+		this.primaryKeyName = primaryKeyName;
+	}
+
+
+	
 }

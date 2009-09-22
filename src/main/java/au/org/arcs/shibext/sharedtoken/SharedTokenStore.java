@@ -30,7 +30,7 @@ public class SharedTokenStore {
 
 	}
 
-	public String getSharedToken(String uid) throws IMASTException {
+	public String getSharedToken(String uid, String primaryKeyName) throws IMASTException {
 		log.debug("calling getSharedToken ...");
 
 		Connection conn = null;
@@ -44,9 +44,9 @@ public class SharedTokenStore {
 				conn = dataSource.getConnection();
 
 				st = conn
-						.prepareStatement("SELECT sharedToken from tb_st WHERE uid=?");
+						.prepareStatement("SELECT sharedToken from tb_st WHERE " + primaryKeyName + "=?");
 				st.setString(1, uid);
-				log.debug("SELECT sharedToken from tb_st WHERE uid=" + uid);
+				log.debug("SELECT sharedToken from tb_st WHERE " + primaryKeyName + "=" + uid);
 				rs = st.executeQuery();
 
 				while (rs.next()) {
@@ -75,7 +75,7 @@ public class SharedTokenStore {
 		return sharedToken;
 	}
 
-	public void storeSharedToken(String uid, String sharedToken)
+	public void storeSharedToken(String uid, String sharedToken, String primaryKeyName)
 			throws IMASTException {
 		log.debug("calling storeSharedToken ...");
 		Connection conn = null;
@@ -86,11 +86,11 @@ public class SharedTokenStore {
 			try {
 				conn = dataSource.getConnection();
 				st = conn
-						.prepareStatement("REPLACE INTO tb_st SET sharedToken = ?, uid = ?");
+						.prepareStatement("REPLACE INTO tb_st SET sharedToken = ?, " + primaryKeyName + " = ?");
 				st.setString(1, sharedToken);
 				st.setString(2, uid);
 				log.debug("REPLACE INTO tb_st SET SharedToken = " + sharedToken
-						+ ", uid = " + uid);
+						+ ", " + primaryKeyName + " = " + uid);
 				int rows = st.executeUpdate();
 				log.debug("Successfully store the SharedToken in the database");
 			} catch (SQLException e) {

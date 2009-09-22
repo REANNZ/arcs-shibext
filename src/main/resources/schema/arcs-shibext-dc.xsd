@@ -128,7 +128,7 @@
 				</documentation>
 			</annotation>
 		</attribute>
-		<attribute name="jdbcUserName" type="string">
+		<attribute name="jdbcUserName" type="string" use="required">
 			<annotation>
 				<documentation>
 					The user name to use while connecting to the
@@ -136,11 +136,18 @@
 				</documentation>
 			</annotation>
 		</attribute>
-		<attribute name="jdbcPassword" type="string">
+		<attribute name="jdbcPassword" type="string" use="required">
 			<annotation>
 				<documentation>
 					The password to use while connecting to the
 					database.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="primaryKeyName" type="string">
+			<annotation>
+				<documentation>
+					The primary key name to index the SharedToken
 				</documentation>
 			</annotation>
 		</attribute>

@@ -70,6 +70,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	/** Primary key in SharedToken database */
 	private static String PRIMARY_KEY = "uid";
 
+	/** Primary key in SharedToken database */
+	private String primaryKeyName;
+
 	/**
 	 * Constructor.
 	 * 
@@ -86,7 +89,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	public SharedTokenDataConnector(String generatedAttributeId,
 			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
 			String idpIdentifier, String idpHome, boolean storeDatabase,
-			DataSource source) {
+			DataSource source, String primaryKeyName) {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
@@ -104,16 +107,18 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 			if (idSalt.length < 16) {
 				log.warn("Provided salt less than 16 bytes in size.");
-				//throw new IllegalArgumentException(
-				//		"Provided salt must be at least 16 bytes in size.");
+				// throw new IllegalArgumentException(
+				// "Provided salt must be at least 16 bytes in size.");
 			}
 			salt = idSalt;
 
 			this.idpIdentifier = idpIdentifier;
-			
+
 			this.idpHome = idpHome;
 
 			this.storeLdap = storeLdap;
+
+			this.primaryKeyName = primaryKeyName;
 
 			this.storeDatabase = storeDatabase;
 
@@ -155,13 +160,17 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			if (storeDatabase) {
 				log
 						.info("storeDatabase = true. Try to get SharedToken from database");
-				Collection<Object> colUid = super.getValuesFromAllDependencies(
-						resolutionContext, PRIMARY_KEY);
+				// Collection<Object> colUid =
+				// super.getValuesFromAllDependencies(
+				// resolutionContext, PRIMARY_KEY);
 
-				String uid = (String) colUid.iterator().next();
+				// String uid = (String) colUid.iterator().next();
+
+				String uid = resolutionContext.getAttributeRequestContext()
+						.getPrincipalName();
 
 				if (stStore != null) {
-					sharedToken = stStore.getSharedToken(uid);
+					sharedToken = stStore.getSharedToken(uid, primaryKeyName);
 				} else {
 					log.error("SharedTokenStore is null");
 					throw new IMASTException("SharedTokenStore is null");
@@ -171,7 +180,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 							.info("sharedToken does not exist, will generate a new one and store in database.");
 
 					sharedToken = getSharedToken(resolutionContext);
-					stStore.storeSharedToken(uid, sharedToken);
+					stStore.storeSharedToken(uid, sharedToken, primaryKeyName);
 				} else {
 					log
 							.info("sharedToken exists, will not generate a new one.");
