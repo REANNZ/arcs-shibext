@@ -204,7 +204,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 								.info("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
 					log
-							.info("sharedToken  exists, will not generate a new one.");
+							.info("sharedToken  exists, will not to generate a new one.");
 					sharedToken = col.iterator().next().toString();
 				}
 			}

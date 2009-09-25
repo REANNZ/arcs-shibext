@@ -87,17 +87,9 @@ public class SharedTokenStore {
 
 			try {
 				conn = dataSource.getConnection();
-				//st = conn
-				//		.prepareStatement("REPLACE INTO tb_st SET sharedToken = ?, " + primaryKeyName + " = ?");
 				st = conn.createStatement();
 				st.execute("INSERT INTO tb_st VALUES ('" + uid + "','" + sharedToken + "')");
-				//st = conn.prepareStatement("INSERT INTO tb_st VALUES ('" + "?" + "','" + "?" + "')");
-				//st.setString(2, sharedToken);
-				//st.setString(1, uid);
-				//log.debug("REPLACE INTO tb_st SET SharedToken = " + sharedToken
-				//		+ ", " + primaryKeyName + " = " + uid);
 				log.debug("INSERT INTO tb_st VALUES ('" + uid + "','" + sharedToken + "')");
-				//int rows = st.executeUpdate();
 				log.debug("Successfully store the SharedToken in the database");
 			} catch (SQLException e) {
 				e.printStackTrace();
