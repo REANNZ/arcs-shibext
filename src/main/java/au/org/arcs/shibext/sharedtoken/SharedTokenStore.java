@@ -31,7 +31,8 @@ public class SharedTokenStore {
 
 	}
 
-	public String getSharedToken(String uid, String primaryKeyName) throws IMASTException {
+	public String getSharedToken(String uid, String primaryKeyName)
+			throws IMASTException {
 		log.debug("calling getSharedToken ...");
 
 		Connection conn = null;
@@ -43,11 +44,17 @@ public class SharedTokenStore {
 
 			try {
 				conn = dataSource.getConnection();
+				if (!isValid(conn)) {
+					conn.close();
+					conn = dataSource.getConnection();
+				}
 
 				st = conn
-						.prepareStatement("SELECT sharedToken from tb_st WHERE " + primaryKeyName + "=?");
+						.prepareStatement("SELECT sharedToken from tb_st WHERE "
+								+ primaryKeyName + "=?");
 				st.setString(1, uid);
-				log.debug("SELECT sharedToken from tb_st WHERE " + primaryKeyName + "=" + uid);
+				log.debug("SELECT sharedToken from tb_st WHERE "
+						+ primaryKeyName + "=" + uid);
 				rs = st.executeQuery();
 
 				while (rs.next()) {
@@ -76,11 +83,11 @@ public class SharedTokenStore {
 		return sharedToken;
 	}
 
-	public void storeSharedToken(String uid, String sharedToken, String primaryKeyName)
-			throws IMASTException {
+	public void storeSharedToken(String uid, String sharedToken,
+			String primaryKeyName) throws IMASTException {
 		log.debug("calling storeSharedToken ...");
 		Connection conn = null;
-		//PreparedStatement st = null;
+		// PreparedStatement st = null;
 		Statement st = null;
 
 		try {
@@ -88,8 +95,10 @@ public class SharedTokenStore {
 			try {
 				conn = dataSource.getConnection();
 				st = conn.createStatement();
-				st.execute("INSERT INTO tb_st VALUES ('" + uid + "','" + sharedToken + "')");
-				log.debug("INSERT INTO tb_st VALUES ('" + uid + "','" + sharedToken + "')");
+				st.execute("INSERT INTO tb_st VALUES ('" + uid + "','"
+						+ sharedToken + "')");
+				log.debug("INSERT INTO tb_st VALUES ('" + uid + "','"
+						+ sharedToken + "')");
 				log.debug("Successfully store the SharedToken in the database");
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -108,5 +117,32 @@ public class SharedTokenStore {
 
 		}
 
+	}
+
+	private boolean isValid(Connection conn) throws SQLException {
+
+		log.debug("testing if the connection is still valid");
+
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT 1");
+			if (rs.next()) {
+				log.debug("the connection is still valid");
+				return true;
+			} else {
+				log.debug("the connection is not valid, will reconnect");
+				return false;
+			}
+		} catch (SQLException e) {
+			log.debug("the connection is invalid, will reconnect");
+			return false;
+		} finally {
+			if (stmt != null)
+				stmt.close();
+			if (rs != null)
+				rs.close();
+		}
 	}
 }
