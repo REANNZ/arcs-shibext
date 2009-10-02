@@ -179,7 +179,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		try {
 			datasource.setDriverClass(driverClass);
 			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
-					null, "jdbcURL")));
+					null, "jdbcURL")+"?autoReconnect=true"));
 			datasource.setUser(DatatypeHelper.safeTrim(dbc.getAttributeNS(null,
 					"jdbcUserName")));
 			datasource.setPassword(DatatypeHelper.safeTrim(dbc.getAttributeNS(
