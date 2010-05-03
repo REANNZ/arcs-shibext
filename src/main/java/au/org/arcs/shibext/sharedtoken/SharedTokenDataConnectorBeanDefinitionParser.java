@@ -80,6 +80,14 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeLdap", true);
 		}
 
+		if (pluginConfig.hasAttributeNS(null, "subtreeSearch")) {
+			pluginBuilder.addPropertyValue("subtreeSearch", XMLHelper
+					.getAttributeValueAsBoolean(pluginConfig
+							.getAttributeNodeNS(null, "subtreeSearch")));
+		} else {
+			pluginBuilder.addPropertyValue("subtreeSearch", true);
+		}
+
 		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
 				.getAttributeNS(null, "sourceAttributeID"));
 		pluginBuilder.addPropertyValue("salt", pluginConfig.getAttributeNS(
@@ -158,8 +166,8 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			BeanDefinitionBuilder pluginBuilder, Element dbc) {
 
 		if (dbc.hasAttributeNS(null, "primaryKeyName")) {
-			pluginBuilder.addPropertyValue("primaryKeyName", dbc.getAttributeNS(null,
-					"primaryKeyName"));
+			pluginBuilder.addPropertyValue("primaryKeyName", dbc
+					.getAttributeNS(null, "primaryKeyName"));
 		} else {
 			pluginBuilder.addPropertyValue("primaryKeyName", "uid");
 		}
@@ -179,7 +187,8 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		try {
 			datasource.setDriverClass(driverClass);
 			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
-					null, "jdbcURL")+"?autoReconnect=true"));
+					null, "jdbcURL")
+					+ "?autoReconnect=true"));
 			datasource.setUser(DatatypeHelper.safeTrim(dbc.getAttributeNS(null,
 					"jdbcUserName")));
 			datasource.setPassword(DatatypeHelper.safeTrim(dbc.getAttributeNS(

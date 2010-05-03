@@ -41,9 +41,12 @@ public class SharedTokenDataConnectorBeanFactory extends
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
 
+	/** Whether to search subtree when store the SharedToken */
+	private boolean subtreeSearch;
+
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
-	
+
 	/**
 	 * The primary key name in the database table to index the SharedToken
 	 */
@@ -143,8 +146,9 @@ public class SharedTokenDataConnectorBeanFactory extends
 	protected Object createInstance() throws Exception {
 		SharedTokenDataConnector connector = new SharedTokenDataConnector(
 				getGeneratedAttribute(), getSourceAttribute(), getSalt(),
-				getStoreLdap(), getIdpIdentifier(), getIdpHome(), getStoreDatabase(),
-				getDataSource(), this.getPrimaryKeyName());
+				getStoreLdap(), getSubtreeSearch(), getIdpIdentifier(),
+				getIdpHome(), getStoreDatabase(), getDataSource(), this
+						.getPrimaryKeyName());
 		populateDataConnector(connector);
 		return connector;
 	}
@@ -162,6 +166,23 @@ public class SharedTokenDataConnectorBeanFactory extends
 	 */
 	public void setStoreLdap(boolean storeLdap) {
 		this.storeLdap = storeLdap;
+	}
+
+	/**
+	 * @return the subtreeSearch
+	 */
+
+	public boolean getSubtreeSearch() {
+		return subtreeSearch;
+	}
+
+	/**
+	 * @param subtreeSearch
+	 *            the subtreeSearch to set
+	 */
+
+	public void setSubtreeSearch(boolean subtreeSearch) {
+		this.subtreeSearch = subtreeSearch;
 	}
 
 	/**
@@ -202,7 +223,8 @@ public class SharedTokenDataConnectorBeanFactory extends
 	}
 
 	/**
-	 * @param idpHome the idpHome to set
+	 * @param idpHome
+	 *            the idpHome to set
 	 */
 	public void setIdpHome(String idpHome) {
 		this.idpHome = idpHome;
@@ -216,12 +238,11 @@ public class SharedTokenDataConnectorBeanFactory extends
 	}
 
 	/**
-	 * @param primaryKeyName the primaryKeyName to set
+	 * @param primaryKeyName
+	 *            the primaryKeyName to set
 	 */
 	public void setPrimaryKeyName(String primaryKeyName) {
 		this.primaryKeyName = primaryKeyName;
 	}
 
-
-	
 }

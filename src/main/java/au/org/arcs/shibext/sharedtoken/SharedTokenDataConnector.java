@@ -61,6 +61,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
 
+	/** Whether to search subtree when store the SharedToken */
+	private boolean subtreeSearch;
+
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
 
@@ -88,8 +91,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
 			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
-			String idpIdentifier, String idpHome, boolean storeDatabase,
-			DataSource source, String primaryKeyName) {
+			boolean subtreeSearch, String idpIdentifier, String idpHome,
+			boolean storeDatabase, DataSource source, String primaryKeyName) {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
@@ -118,6 +121,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 			this.storeLdap = storeLdap;
 
+			this.subtreeSearch = subtreeSearch;
+
 			this.primaryKeyName = primaryKeyName;
 
 			this.storeDatabase = storeDatabase;
@@ -144,7 +149,11 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.ResolutionPlugIn#resolve(edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.ShibbolethResolutionContext)
+	 * @see
+	 * edu.internet2.middleware.shibboleth.common.attribute.resolver.provider
+	 * .ResolutionPlugIn
+	 * #resolve(edu.internet2.middleware.shibboleth.common.attribute
+	 * .resolver.provider.ShibbolethResolutionContext)
 	 */
 	/** {@inheritDoc} */
 	public Map<String, BaseAttribute> resolve(
@@ -263,7 +272,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					.getAttributeRequestContext().getPrincipalName();
 
 			(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME, sharedToken,
-					getDependencyIds().get(0), principalName, idpHome);
+					getDependencyIds().get(0), principalName, idpHome, subtreeSearch);
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			e.printStackTrace();

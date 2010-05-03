@@ -11,12 +11,15 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.naming.Context;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.StartTlsRequest;
@@ -61,7 +64,7 @@ public class LdapUtil {
 	}
 
 	public void saveAttribute(String attributeName, String attributeValue,
-			String dataConnectorID, String principalName, String idpHome)
+			String dataConnectorID, String principalName, String idpHome, boolean subtreeSearch)
 			throws IMASTException {
 
 		log.info("storing sharedToken to Ldap ...");
@@ -79,44 +82,41 @@ public class LdapUtil {
 
 			String attributeResolver = shareTokenProperties
 					.getProperty("ATTRIBUTE_RESOLVER");
-			
-			
-			if(idpHome != null && !idpHome.trim().equals("")){
+
+			if (idpHome != null && !idpHome.trim().equals("")) {
 				log.debug("get IDP_HOME from data connector");
 				log.debug("IDP_HOME : " + idpHome);
-			}else{
-				log.debug("couldn't get IDP_HOME from data connector. try to get it from system env");
+			} else {
+				log
+						.debug("couldn't get IDP_HOME from data connector. try to get it from system env");
 				idpHome = System.getenv("IDP_HOME");
-				if(idpHome != null && !idpHome.trim().equals("")){
+				if (idpHome != null && !idpHome.trim().equals("")) {
 					log.debug("IDP_HOME : " + idpHome);
-				}else{
-					log.debug("couldn't get IDP_HOME from system env. try to get it sharedtoken.properties");
+				} else {
+					log
+							.debug("couldn't get IDP_HOME from system env. try to get it sharedtoken.properties");
 					idpHome = shareTokenProperties
-					.getProperty("DEFAULT_IDP_HOME");
-					if(idpHome != null && !idpHome.trim().equals("")){
+							.getProperty("DEFAULT_IDP_HOME");
+					if (idpHome != null && !idpHome.trim().equals("")) {
 						log.debug("IDP_HOME : " + idpHome);
-					}else{
+					} else {
 						log.error("couldn't get IDP_HOME anywhere");
 					}
-					
+
 				}
 			}
 
 			/*
-			if (idpHome == null || idpHome.trim().equals("")) {
-				log
-						.debug("couldn't get IDP_HOME from data connector. try to get it from system env");
-				idpHome = System.getenv("IDP_HOME");
-
-				if (idpHome == null || idpHome.trim().equals("")) {
-					idpHome = shareTokenProperties
-							.getProperty("DEFAULT_IDP_HOME");
-					log
-							.debug("couldn't get IDP_HOME from system env. use defaut instead : "
-									+ idpHome);
-				}
-			}
-			*/
+			 * if (idpHome == null || idpHome.trim().equals("")) { log.debug(
+			 * "couldn't get IDP_HOME from data connector. try to get it from system env"
+			 * ); idpHome = System.getenv("IDP_HOME");
+			 * 
+			 * if (idpHome == null || idpHome.trim().equals("")) { idpHome =
+			 * shareTokenProperties .getProperty("DEFAULT_IDP_HOME"); log
+			 * .debug(
+			 * "couldn't get IDP_HOME from system env. use defaut instead : " +
+			 * idpHome); } }
+			 */
 
 			if (idpHome != null && attributeResolver != null) {
 				attributeResolver = attributeResolver.replace("$IDP_HOME",
@@ -141,20 +141,41 @@ public class LdapUtil {
 				searchFilter = searchFilterSpec.replace("{0}", principalName);
 				log.info("ldap search filter : " + searchFilter);
 			}
+			
+			String objectName = null;
+
+			if(subtreeSearch){
+			// do search with subtree and find the object name in the subtree
+			SearchControls ctls = new SearchControls();
+			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			NamingEnumeration e = context.search("", searchFilter, ctls);
+			
+			while (e.hasMore()) {
+				SearchResult entry = (SearchResult) e.next();
+				objectName = entry.getName();
+				log.debug("the objects to modify: " + objectName);
+			}
+			log.debug("the last one - " + objectName
+					+ " is considered to be modified");
+			}else{
+				objectName = searchFilter;
+			}
 
 			Attribute mod0 = new BasicAttribute(attributeName, attributeValue);
 			ModificationItem[] mods = new ModificationItem[1];
 
-			log.info("adding sharedToken to ldap entry");
+			log.info("adding " + attributeName + " : " + attributeValue
+					+ " to " + properties.getProperty(context.PROVIDER_URL)
+					+ "," + objectName);
 
 			mods[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod0);
 			try {
-				context.modifyAttributes(searchFilter, mods);
+				context.modifyAttributes(objectName, mods);
 				log.info("add successfully");
-			} catch (NamingException e) {
-				e.printStackTrace();
-				throw new IMASTException(e.getMessage().concat(
-						"\n failed to add sharedToken to ldap entry"), e
+			} catch (NamingException ex) {
+				ex.printStackTrace();
+				throw new IMASTException(ex.getMessage().concat(
+						"\n failed to add sharedToken to ldap entry"), ex
 						.getCause());
 				// mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
 				// mod0);

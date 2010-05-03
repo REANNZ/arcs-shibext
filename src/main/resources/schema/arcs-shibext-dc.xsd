@@ -73,6 +73,15 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				
+				<attribute name="subtreeSearch" type="boolean">
+					<annotation>
+						<documentation>
+							Whether to search subtree when store the SharedToken.
+						</documentation>
+					</annotation>
+				</attribute>
+				
 				<attribute name="idpIdentifier" type="string">
 					<annotation>
 						<documentation>
