@@ -186,9 +186,16 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 		try {
 			datasource.setDriverClass(driverClass);
+			// remove autoReconnect=true as it's reported not right for Oracle.
+			/*
 			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
 					null, "jdbcURL")
 					+ "?autoReconnect=true"));
+			*/
+			
+			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
+					null, "jdbcURL")));
+
 			datasource.setUser(DatatypeHelper.safeTrim(dbc.getAttributeNS(null,
 					"jdbcUserName")));
 			datasource.setPassword(DatatypeHelper.safeTrim(dbc.getAttributeNS(
