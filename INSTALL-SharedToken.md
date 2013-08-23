@@ -1,6 +1,6 @@
 arcs-shibext
 ============
-[Database Support] [1]
+
 ARCS Shibboleth extensions - sharedToken implementation
 
 Imported from http://projects.arcs.org.au/trac/systems/wiki/HowTo/PilotAAF/SharedToken
