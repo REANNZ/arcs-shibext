@@ -32,7 +32,7 @@ Find the correct directory to install into, you will need to find the WEB-INF di
 export IDP_SRC_HOME=/opt/shibboleth-identityprovider-2.1.2
 ```
 
-We'll install the latest version in this instruction. You can find out old versions at http://projects.arcs.org.au/svn/systems/tags/idp/arcs-shibext/
+We'll install the latest version in this instruction. You can find older versions at https://github.com/University-of-Auckland/arcs-shibext/releases/
 
 ### Install from binary
 
@@ -40,13 +40,13 @@ Remove the old version if any and download jar into place
 ```
 cd $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib
 rm arcs-shibext-*.jar
-wget http://projects.arcs.org.au/svn/systems/tags/idp/arcs-shibext/arcs-shibext-1.5.4/download/arcs-shibext-1.5.4.jar
+wget https://github.com/University-of-Auckland/arcs-shibext/blob/master/download/arcs-shibext-1.5.4.jar
 ```
 
 ```
 cd $IDP_SRC_HOME/lib
 rm arcs-shibext-*.jar
-wget http://projects.arcs.org.au/svn/systems/tags/idp/arcs-shibext/arcs-shibext-1.5.4/download/arcs-shibext-1.5.4.jar
+wget https://github.com/University-of-Auckland/arcs-shibext/blob/master/download/arcs-shibext-1.5.4.jar
 ```
 Run IdP install script again. '''(make sure to answer NO to "DO you want to overwrite your configuration")'''
 ```
@@ -60,7 +60,7 @@ Apache Maven2 is needed to build the source. Find the Maven2 installation guide 
 Download the source package
 ```
 cd /tmp
-wget http://projects.arcs.org.au/svn/systems/tags/idp/arcs-shibext/arcs-shibext-1.5.4/download/arcs-shibext-1.5.4-src.tar.gz
+wget https://github.com/University-of-Auckland/arcs-shibext/blob/master/download/arcs-shibext-1.5.4-src.tar.gz
 tar xzvf arcs-shibext-1.5.4-src.tar.gz
 cd arcs-shibext-1.5.4
 ```
