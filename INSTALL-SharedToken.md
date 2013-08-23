@@ -1,6 +1,6 @@
 arcs-shibext
 ============
-
+[Database Support] [1]
 ARCS Shibboleth extensions - sharedToken implementation
 
 Imported from http://projects.arcs.org.au/trac/systems/wiki/HowTo/PilotAAF/SharedToken
@@ -261,4 +261,4 @@ PRIMARY KEY  (uid)
 
 Note: replace the "uid" with the primary key name if you have set it in above.
 ```
-[1]: #database-support	"Database Support"
+[1]: #database-support "Database Support"
