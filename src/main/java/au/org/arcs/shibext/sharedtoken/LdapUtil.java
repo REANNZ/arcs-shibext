@@ -50,6 +50,8 @@ public class LdapUtil {
 	private Properties shareTokenProperties;
 
 	private static String PROPERTIES_FILE = "conf/sharedtoken.properties";
+	private static String DATA_CONNECTOR_XML_NS = "urn:mace:shibboleth:2.0:resolver:dc";
+	private static String RESOLVER_XML_NS = "urn:mace:shibboleth:2.0:resolver";
 
 	public LdapUtil() throws IMASTException {
 
@@ -321,10 +323,10 @@ public class LdapUtil {
 			ldapRawProperties.put("useStartTLS", ldapConfig
 					.getAttribute("useStartTLS"));
 			ldapRawProperties.put("filterTemplate", ldapConfig
-					.getElementsByTagName("FilterTemplate").item(0)
+					.getElementsByTagNameNS(DATA_CONNECTOR_XML_NS, "FilterTemplate").item(0)
 					.getTextContent().trim());
 
-			log.debug("ldapRowProperties " + ldapRawProperties);
+			log.debug("ldapRawProperties " + ldapRawProperties);
 		} catch (Exception e) {
 			throw new IMASTException("Could not parse LDAP config", e);
 		}
@@ -356,12 +358,13 @@ public class LdapUtil {
 		try {
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
 					.newInstance();
+			docBuilderFactory.setNamespaceAware(true);
 			DocumentBuilder docBuilder = null;
 			docBuilder = docBuilderFactory.newDocumentBuilder();
 			Document doc;
 			doc = docBuilder.parse(new File(attributeResolver));
 			NodeList dataConnectors = doc
-					.getElementsByTagName("resolver:DataConnector");
+					.getElementsByTagNameNS(RESOLVER_XML_NS, "DataConnector");
 			for (int s = 0; s < dataConnectors.getLength(); s++) {
 				elem = (Element) dataConnectors.item(s);
 				String id = elem.getAttribute("id");
