@@ -61,22 +61,19 @@ public class SharedTokenStore {
 					sharedToken = rs.getString("sharedToken");
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
-				log.error(e.getMessage());
-				throw new IMASTException(e.getMessage());
+				log.error("Error executing SQL statement", e);
+				throw new IMASTException("Error executing SQL statement", e);
 			} finally {
 				try {
 					rs.close();
 					conn.close();
 				} catch (SQLException e) {
-					throw new IMASTException(e.getMessage());
+					throw new IMASTException("Error closing database connection", e);
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage()
-					+ "\n Failed to get SharedToken from database");
-
+			log.error("Failed to get SharedToken from database", e);
+			throw new IMASTException("Failed to get SharedToken from database", e);
 		}
 		log.info("SharedToken : " + sharedToken);
 
@@ -101,20 +98,18 @@ public class SharedTokenStore {
 						+ sharedToken + "')");
 				log.debug("Successfully store the SharedToken in the database");
 			} catch (SQLException e) {
-				e.printStackTrace();
-				throw new IMASTException(e.getMessage());
+				log.error("Failed to store SharedToken into database", e);
+				throw new IMASTException("Failed to store SharedToken into database", e);
 			} finally {
 				try {
 					conn.close();
 				} catch (SQLException e) {
-					throw new IMASTException(e.getMessage());
+					throw new IMASTException("Error closing database connection", e);
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage()
-					+ "Failed to store SharedToken to database");
-
+			log.error("Failed to store SharedToken into database", e);
+			throw new IMASTException("Failed to store SharedToken into database", e);
 		}
 
 	}
@@ -136,7 +131,7 @@ public class SharedTokenStore {
 				return false;
 			}
 		} catch (SQLException e) {
-			log.debug("the connection is invalid, will reconnect");
+			log.warn("Database connection is invalid, will reconnect", e);
 			return false;
 		} finally {
 			if (stmt != null)

@@ -139,9 +139,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
-			e.printStackTrace();
-			log.error(e.getMessage()
-					+ "\n failed to construct SharedTokenDataConnector object");
+                        log.error("Failed to construct SharedTokenDataConnector object", e);
 		}
 
 	}
@@ -223,9 +221,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			attributes.put(attribute.getId(), attribute);
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
-			log.error(e.getMessage());
-			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME);
-			// e.printStackTrace();
+			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME, e);
 		}
 		return attributes;
 	}
@@ -275,11 +271,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					getDependencyIds().get(0), principalName, idpHome, subtreeSearch);
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
-			e.printStackTrace();
-			log.error(e.getMessage().concat(
-					"\n failed to store sharedToken to Ldap. "));
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to save attribute to ldap entry"), e.getCause());
+			log.error("Failed to store sharedToken into LDAP", e);
+			throw new IMASTException("Failed to save attribute into ldap entry", e);
 
 		}
 	}
@@ -322,9 +315,8 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			persistentId = this.replace(persistentId);
 			log.info("the created sharedToken: " + persistentId);
 		} catch (Exception e) {
-			log.error("\n failed to create the sharedToken. ");
-			throw new AttributeResolutionException(e.getMessage().concat(
-					"\n failed to create the sharedToken."));
+			log.error("Failed to create the sharedToken", e);
+			throw new AttributeResolutionException("Failed to create the sharedToken", e);
 		}
 		return persistentId;
 

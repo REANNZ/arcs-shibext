@@ -58,8 +58,7 @@ public class LdapUtil {
 			shareTokenProperties.load(this.getClass().getClassLoader()
 					.getResourceAsStream(PROPERTIES_FILE));
 		} catch (IOException e) {
-			throw new IMASTException(e.getMessage().concat("\n couldn't load ")
-					.concat(PROPERTIES_FILE).concat(" file"), e.getCause());
+			throw new IMASTException("Could not load properties file " + PROPERTIES_FILE, e);
 		}
 	}
 
@@ -174,18 +173,14 @@ public class LdapUtil {
 				log.info("add successfully");
 			} catch (NamingException ex) {
 				ex.printStackTrace();
-				throw new IMASTException(ex.getMessage().concat(
-						"\n failed to add sharedToken to ldap entry"), ex
-						.getCause());
+				throw new IMASTException("Failed to add sharedToken to ldap entry", ex);
 				// mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
 				// mod0);
 				// dirContext.modifyAttributes(populatedSearch, mods);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage().concat(
-					"\n failed to add sharedToken to ldap entry"));
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to save attribute to ldap entry"), e.getCause());
+			log.error("Failed to add sharedToken to ldap entry", e);
+			throw new IMASTException("Failed to save attribute to ldap entry", e);
 		}
 
 	}
@@ -254,10 +249,8 @@ public class LdapUtil {
 				context = new InitialDirContext(properties);
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to initiate ldap context"), e.getCause());
+			log.error("Failed to initialize LDAP context", e);
+			throw new IMASTException("Failed to initialize LDAP context", e);
 		}
 
 		return context;
@@ -291,8 +284,7 @@ public class LdapUtil {
 			properties.put(Context.SECURITY_CREDENTIALS, pricipalCre);
 			properties.put("useStartTLS", useStartTLS);
 		} catch (Exception e) {
-			throw new IMASTException(e.getMessage().concat(
-					"\n fail to build ldap properties"));
+			throw new IMASTException("Failed to build ldap properties", e);
 		}
 		log.info(properties.toString());
 		return properties;
@@ -334,8 +326,7 @@ public class LdapUtil {
 
 			log.debug("ldapRowProperties " + ldapRawProperties);
 		} catch (Exception e) {
-
-			throw new IMASTException(e.getMessage(), e.getCause());
+			throw new IMASTException("Could not parse LDAP config", e);
 		}
 		return ldapRawProperties;
 
@@ -378,25 +369,17 @@ public class LdapUtil {
 					break;
 			}
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to parse attribute resolver file."), e
-					.getCause());
+                        log.error("Failed to parse attribute resolver file", e);
+			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to parse attribute resolver file."), e
-					.getCause());
+                        log.error("Failed to parse attribute resolver file", e);
+			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to parse attribute resolver file."), e
-					.getCause());
+                        log.error("Failed to parse attribute resolver file", e);
+			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IMASTException(e.getMessage().concat(
-					"\n failed to parse attribute resolver file."), e
-					.getCause());
+                        log.error("Failed to parse attribute resolver file", e);
+			throw new IMASTException("Failed to parse attribute resolver file", e);
 
 		}
 

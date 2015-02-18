@@ -78,8 +78,7 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 			salt = idSalt;
 		} catch (Exception e) {
 			// catch any exception to let IdP go on
-			log.error(e.getMessage().concat(
-					"\n failed to construct TargetedIDDataConnector "));
+			log.error("Failed to construct TargetedIDDataConnector", e);
 		}
 	}
 
@@ -101,8 +100,7 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 			log.info("successfully generated " + generatedAttribute + " : " + targetedID);
 		} catch (Exception e) {
 			// catch any exception to let IdP go on
-			log.error(e.getMessage().concat("\n failed to resolve ").concat(
-					generatedAttribute));
+			log.error("Failed to resolve " + generatedAttribute, e);
 		}
 		return attributes;
 	}
@@ -209,8 +207,8 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 			targetedID = this.replace(targetedID);
 
 		} catch (Exception e) {
-			log.error("failed to create the targetedID");
-			throw new AttributeResolutionException(e.getMessage());
+			log.error("Failed to create the targetedID", e);
+			throw new AttributeResolutionException("Failed to create the targetedID", e);
 		}
 		return targetedID;
 	}
