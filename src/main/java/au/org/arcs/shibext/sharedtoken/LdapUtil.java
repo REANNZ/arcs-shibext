@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Iterator;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,6 +55,7 @@ public class LdapUtil {
 	private static String PROPERTIES_FILE = "conf/sharedtoken.properties";
 	private static String DATA_CONNECTOR_XML_NS = "urn:mace:shibboleth:2.0:resolver:dc";
 	private static String RESOLVER_XML_NS = "urn:mace:shibboleth:2.0:resolver";
+	private static String LDAP_PROPERTY_PASSTHROUGH_PREFIX = "shibboleth.resolver.dc.ldapproperty.";
 
 	public LdapUtil() throws IMASTException {
 
@@ -285,6 +289,16 @@ public class LdapUtil {
 			properties.put(Context.SECURITY_PRINCIPAL, secPrincipal);
 			properties.put(Context.SECURITY_CREDENTIALS, pricipalCre);
 			properties.put("useStartTLS", useStartTLS);
+
+			// pass through any property prefixed with
+			// LDAP_PROPERTY_PASSTHROUGH_PREFIX (and strip this prefix again)
+			for (Iterator<String> it = ldapRawProp.keySet().iterator(); it.hasNext();) {
+                            String propertyKey=it.next();
+                            if (propertyKey.startsWith(LDAP_PROPERTY_PASSTHROUGH_PREFIX)) {
+                                properties.put(propertyKey.substring(LDAP_PROPERTY_PASSTHROUGH_PREFIX.length()),ldapRawProp.get(propertyKey));
+                            };
+                        };
+                            
 		} catch (Exception e) {
 			throw new IMASTException("Failed to build ldap properties", e);
 		}
@@ -325,6 +339,21 @@ public class LdapUtil {
 			ldapRawProperties.put("filterTemplate", ldapConfig
 					.getElementsByTagNameNS(DATA_CONNECTOR_XML_NS, "FilterTemplate").item(0)
 					.getTextContent().trim());
+			// Iterate over all LDAP properties defined in connector and store
+			// them in ldapRawProperties to pass them through to the LDAP
+			// connection we establish.
+			// Look for anything like
+			//    <dc:LDAPProperty name="java.naming.referral" value="follow"/>
+
+                        NodeList propertyNodeList = ldapConfig.getElementsByTagNameNS(DATA_CONNECTOR_XML_NS, "LDAPProperty");
+                        for (int i = 0; i<propertyNodeList.getLength(); i++) {
+                            Node propertyNode = propertyNodeList.item(i);
+                            NamedNodeMap propertyAttributes = propertyNode.getAttributes();
+                            ldapRawProperties.put(LDAP_PROPERTY_PASSTHROUGH_PREFIX+propertyAttributes.getNamedItem("name").getNodeValue(),
+                                    propertyAttributes.getNamedItem("value").getNodeValue());
+			};
+
+			
 
 			log.debug("ldapRawProperties " + ldapRawProperties);
 		} catch (Exception e) {
