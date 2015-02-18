@@ -12,10 +12,10 @@
     
     <repositories>
         <repository>
-            <id>shibboleth.internet2.edu</id>
-            <name>Internet2</name>
+            <id>shib-release</id>
+            <name>Shibboleth Project - releases</name>
             <layout>default</layout>
-            <url>http://shibboleth.internet2.edu/downloads/maven2</url>
+            <url>https://build.shibboleth.net/nexus/content/groups/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
