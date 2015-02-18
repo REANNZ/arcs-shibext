@@ -372,16 +372,16 @@ public class LdapUtil {
 					break;
 			}
 		} catch (ParserConfigurationException e) {
-                        log.error("Failed to parse attribute resolver file", e);
+			log.error("Failed to parse attribute resolver file", e);
 			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (SAXException e) {
-                        log.error("Failed to parse attribute resolver file", e);
+			log.error("Failed to parse attribute resolver file", e);
 			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (IOException e) {
-                        log.error("Failed to parse attribute resolver file", e);
+			log.error("Failed to parse attribute resolver file", e);
 			throw new IMASTException("Failed to parse attribute resolver file", e);
 		} catch (Exception e) {
-                        log.error("Failed to parse attribute resolver file", e);
+			log.error("Failed to parse attribute resolver file", e);
 			throw new IMASTException("Failed to parse attribute resolver file", e);
 
 		}
