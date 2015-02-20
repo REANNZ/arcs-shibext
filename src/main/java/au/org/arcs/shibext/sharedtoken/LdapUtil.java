@@ -153,7 +153,7 @@ public class LdapUtil {
 			// do search with subtree and find the object name in the subtree
 			SearchControls ctls = new SearchControls();
 			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			NamingEnumeration e = context.search("", searchFilter, ctls);
+			NamingEnumeration<SearchResult> e = context.search("", searchFilter, ctls);
 			
 			while (e.hasMore()) {
 				SearchResult entry = (SearchResult) e.next();
@@ -170,7 +170,7 @@ public class LdapUtil {
 			ModificationItem[] mods = new ModificationItem[1];
 
 			log.info("adding " + attributeName + " : " + attributeValue
-					+ " to " + properties.getProperty(context.PROVIDER_URL)
+					+ " to " + properties.getProperty(InitialDirContext.PROVIDER_URL)
 					+ "," + objectName);
 
 			mods[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE, mod0);

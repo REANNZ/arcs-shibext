@@ -3,9 +3,9 @@
  */
 package au.org.arcs.shibext.handler;
 
+import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
 import au.org.arcs.shibext.sharedtoken.SharedTokenDataConnectorBeanDefinitionParser;
 import au.org.arcs.shibext.targetedid.TargetedIDDataConnectorBeanDefinitionParser;
-import edu.internet2.middleware.shibboleth.common.config.BaseSpringNamespaceHandler;
 
 /**
  * @author Damien Chen

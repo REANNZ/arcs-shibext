@@ -3,27 +3,33 @@
  */
 package au.org.arcs.shibext.targetedid;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import org.opensaml.xml.util.DatatypeHelper;
-import org.opensaml.xml.util.LazyMap;
+import net.shibboleth.idp.attribute.resolver.AbstractDataConnector;
+import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
+import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
+import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
+import net.shibboleth.idp.attribute.resolver.ResolutionException;
+import net.shibboleth.idp.attribute.IdPAttribute;
+import net.shibboleth.idp.attribute.IdPAttributeValue;
+import net.shibboleth.idp.attribute.StringAttributeValue;
+import net.shibboleth.utilities.java.support.collection.LazyMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
-import edu.internet2.middleware.shibboleth.common.attribute.provider.BasicAttribute;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.AttributeResolutionException;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.ShibbolethResolutionContext;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.dataConnector.BaseDataConnector;
+import au.org.arcs.shibext.sharedtoken.MiscHelper;
 
 /**
  * @author Damien Chen
  * 
  */
-public class TargetedIDDataConnector extends BaseDataConnector {
+public class TargetedIDDataConnector extends AbstractDataConnector {
 
 	/** Class logger. */
 	private final Logger log = LoggerFactory
@@ -59,13 +65,13 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 
 		try {
 			log.info("construct TargetedIDDataConnector ...");
-			if (DatatypeHelper.isEmpty(generatedAttributeId)) {
+			if (MiscHelper.isEmpty(generatedAttributeId)) {
 				throw new IllegalArgumentException(
 						"Provided generated attribute ID must not be empty");
 			}
 			generatedAttribute = generatedAttributeId;
 
-			if (DatatypeHelper.isEmpty(sourceAttributeId)) {
+			if (MiscHelper.isEmpty(sourceAttributeId)) {
 				throw new IllegalArgumentException(
 						"Provided source attribute ID must not be empty");
 			}
@@ -83,19 +89,22 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	}
 
 	/** {@inheritDoc} */
-	public Map<String, BaseAttribute> resolve(
-			ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+
+	@Override
+	protected Map<String, IdPAttribute> doDataConnectorResolve(
+			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 		
 		log.info("starting TargetedIDDataConnector.resolve( ) ...");
 
-		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
+		Map<String, IdPAttribute> attributes = new LazyMap<String, IdPAttribute>();
 
 		try {
-			String targetedID = getTargetedID(resolutionContext);
-			BasicAttribute<String> attribute = new BasicAttribute<String>();
-			attribute.setId(getGeneratedAttributeId());
-			attribute.getValues().add(targetedID);
+			String targetedID = getTargetedID(resolutionContext, resolverWorkContext);
+			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
+			Collection<IdPAttributeValue<String>> values = new ArrayList<IdPAttributeValue<String>>();
+			values.add(new StringAttributeValue(targetedID));
+			attribute.setValues(values);			
 			attributes.put(attribute.getId(), attribute);
 			log.info("successfully generated " + generatedAttribute + " : " + targetedID);
 		} catch (Exception e) {
@@ -114,14 +123,14 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 * 
 	 * @return persistent ID
 	 * 
-	 * @throws AttributeResolutionException
+	 * @throws ResolutionException
 	 *             thrown if there is a problem retrieving or storing the
 	 *             persistent ID
 	 */
-	private String getTargetedID(ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+	private String getTargetedID(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 
-		String localId = getLocalId(resolutionContext);
+		String localId = getLocalId(resolutionContext, resolverWorkContext);
 		String targetedID = createTargetedID(resolutionContext, localId, salt);
 		return targetedID;
 	}
@@ -134,27 +143,33 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 * 
 	 * @return local ID component of the persistent ID
 	 * 
-	 * @throws AttributeResolutionException
+	 * @throws ResolutionException
 	 *             thrown if there is a problem resolving the local id
 	 */
-	private String getLocalId(ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+	private String getLocalId(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 		log.info("gets local ID ...");
 
 		StringBuffer localIdValue = new StringBuffer();
 
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
-
+		// get list of already resolved attributes (from dependencies)
+		Map <String,ResolvedAttributeDefinition> resolvedAttributesMap = 
+				resolverWorkContext.getResolvedIdPAttributeDefinitions();
+		
 		for (int i = 0; i < ids.length; i++) {
 
-			Collection<Object> sourceIdValues = getValuesFromAllDependencies(
-					resolutionContext, ids[i]);
+			Collection<IdPAttributeValue<?>> sourceIdValues = null;
+			
+			if (resolvedAttributesMap.get(ids[i]) != null ) 
+				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
+			
 			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
 				log
 						.error(
 								"Source attribute {} for connector {} provide no values",
 								getSourceAttributeId(), getId());
-				throw new AttributeResolutionException("Source attribute "
+				throw new ResolutionException("Source attribute "
 						+ getSourceAttributeId() + " for connector " + getId()
 						+ " provided no values");
 			}
@@ -186,17 +201,15 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	 * @return the created identifier
 	 */
 	private String createTargetedID(
-			ShibbolethResolutionContext resolutionContext, String localId,
-			byte[] salt) throws AttributeResolutionException {
+			AttributeResolutionContext resolutionContext, String localId,
+			byte[] salt) throws ResolutionException {
 
 		log.info("creating targetedID");
 		String targetedID = null;
 
 		try {
-			String localEntityID = resolutionContext
-					.getAttributeRequestContext().getLocalEntityId();
-			String peerEntityID = resolutionContext
-					.getAttributeRequestContext().getInboundMessageIssuer();
+			String localEntityID = resolutionContext.getAttributeIssuerID();
+			String peerEntityID = resolutionContext.getAttributeRecipientID();
 			String globalUniqueID = localId + localEntityID + peerEntityID
 					+ new String(salt);
 			log.info("the uniqueID (user/IdP/SP/salt) : " + localId + " / "
@@ -208,7 +221,7 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 
 		} catch (Exception e) {
 			log.error("Failed to create the targetedID", e);
-			throw new AttributeResolutionException("Failed to create the targetedID", e);
+			throw new ResolutionException("Failed to create the targetedID", e);
 		}
 		return targetedID;
 	}
@@ -268,11 +281,11 @@ public class TargetedIDDataConnector extends BaseDataConnector {
 	}
 
 	/** {@inheritDoc} */
-	public void validate() throws AttributeResolutionException {
-		if (getDependencyIds() == null || getDependencyIds().size() != 1) {
+	public void validate() throws ResolutionException {
+		if (getDependencies().size() != 1) {
 			log.error("targetedID " + getId()
 					+ " data connectore requires exactly one dependency");
-			throw new AttributeResolutionException("Computed ID " + getId()
+			throw new ResolutionException("Computed ID " + getId()
 					+ " data connectore requires exactly one dependency");
 		}
 	}

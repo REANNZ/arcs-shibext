@@ -3,6 +3,7 @@
  */
 package au.org.arcs.shibext.sharedtoken;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,23 +11,25 @@ import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.opensaml.xml.util.DatatypeHelper;
-import org.opensaml.xml.util.LazyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
-import edu.internet2.middleware.shibboleth.common.attribute.provider.BasicAttribute;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.AttributeResolutionException;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.ShibbolethResolutionContext;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.dataConnector.BaseDataConnector;
-import edu.internet2.middleware.shibboleth.common.attribute.resolver.provider.dataConnector.StoredIDStore;
+import net.shibboleth.idp.attribute.resolver.AbstractDataConnector;
+import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
+import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
+import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
+import net.shibboleth.idp.attribute.resolver.ResolutionException;
+import net.shibboleth.idp.attribute.IdPAttribute;
+import net.shibboleth.idp.attribute.IdPAttributeValue;
+import net.shibboleth.idp.attribute.StringAttributeValue;
+import net.shibboleth.idp.attribute.resolver.ResolverPluginDependency;
+import net.shibboleth.utilities.java.support.collection.LazyMap;
 
 /**
  * @author Damien Chen
  * 
  */
-public class SharedTokenDataConnector extends BaseDataConnector {
+public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	/** Class logger. */
 	private final Logger log = LoggerFactory
@@ -71,10 +74,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	private SharedTokenStore stStore;
 
 	/** Primary key in SharedToken database */
-	private static String PRIMARY_KEY = "uid";
-
-	/** Primary key in SharedToken database */
 	private String primaryKeyName;
+
+	public SharedTokenDataConnector() {
+		super();
+		log.info("construct empty SharedTokenDataConnector ...");
+	}
 
 	/**
 	 * Constructor.
@@ -96,45 +101,33 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 		try {
 			log.info("construct SharedTokenDataConnector ...");
-			if (DatatypeHelper.isEmpty(generatedAttributeId)) {
+			if (MiscHelper.isEmpty(generatedAttributeId)) {
 				throw new IllegalArgumentException(
 						"Provided generated attribute ID must not be empty");
 			}
-			generatedAttribute = generatedAttributeId;
+			setGeneratedAttribute(generatedAttributeId);
 
-			if (DatatypeHelper.isEmpty(sourceAttributeId)) {
+			if (MiscHelper.isEmpty(sourceAttributeId)) {
 				throw new IllegalArgumentException(
 						"Provided source attribute ID must not be empty");
 			}
-			sourceAttribute = sourceAttributeId;
+			setSourceAttribute(sourceAttributeId);
 
 			if (idSalt.length < 16) {
 				log.warn("Provided salt less than 16 bytes in size.");
 				// throw new IllegalArgumentException(
 				// "Provided salt must be at least 16 bytes in size.");
 			}
-			salt = idSalt;
-
-			this.idpIdentifier = idpIdentifier;
-
-			this.idpHome = idpHome;
-
-			this.storeLdap = storeLdap;
-
-			this.subtreeSearch = subtreeSearch;
-
-			this.primaryKeyName = primaryKeyName;
-
-			this.storeDatabase = storeDatabase;
+			setSalt(idSalt);
+			setIdpIdentifier(idpIdentifier);
+			setIdpHome(idpHome);
+			setStoreLdap(storeLdap);
+			setSubtreeSearch(subtreeSearch);
+			setPrimaryKeyName(primaryKeyName);
+			setStoreDatabase(storeDatabase);
 
 			if (storeDatabase) {
-				if (source != null) {
-					stStore = new SharedTokenStore(source);
-				} else {
-					log.error("DataSource should not be null");
-					throw new IllegalArgumentException(
-							"DataSource should not be null");
-				}
+				setDataSource(source);
 			}
 
 		} catch (Exception e) {
@@ -151,16 +144,18 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 * edu.internet2.middleware.shibboleth.common.attribute.resolver.provider
 	 * .ResolutionPlugIn
 	 * #resolve(edu.internet2.middleware.shibboleth.common.attribute
-	 * .resolver.provider.ShibbolethResolutionContext)
+	 * .resolver.provider.AttributeResolutionContext)
 	 */
 	/** {@inheritDoc} */
-	public Map<String, BaseAttribute> resolve(
-			ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+
+	@Override
+	protected Map<String, IdPAttribute> doDataConnectorResolve(
+			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 
 		log.info("starting SharedTokenDataConnector.resolve( ) ...");
 
-		Map<String, BaseAttribute> attributes = new LazyMap<String, BaseAttribute>();
+		Map<String, IdPAttribute> attributes = new LazyMap<String, IdPAttribute>();
 
 		String sharedToken = null;
 		try {
@@ -173,8 +168,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 
 				// String uid = (String) colUid.iterator().next();
 
-				String uid = resolutionContext.getAttributeRequestContext()
-						.getPrincipalName();
+				String uid = resolutionContext.getPrincipal();
 
 				if (stStore != null) {
 					sharedToken = stStore.getSharedToken(uid, primaryKeyName);
@@ -186,7 +180,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 					log
 							.info("sharedToken does not exist, will generate a new one and store in database.");
 
-					sharedToken = getSharedToken(resolutionContext);
+					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
 					stStore.storeSharedToken(uid, sharedToken, primaryKeyName);
 				} else {
 					log
@@ -195,13 +189,15 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			} else {
 				log
 						.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
-				Collection<Object> col = super.getValuesFromAllDependencies(
-						resolutionContext, STORED_ATTRIBUTE_NAME);
-				//
-				if (col.size() < 1) {
+				// TODO-CHECK: get already resolved attribute (from LDAP)
+				ResolvedAttributeDefinition resolvedSharedTokenFromLDAP = 
+						resolverWorkContext.getResolvedIdPAttributeDefinitions().get(STORED_ATTRIBUTE_NAME);
+				IdPAttribute sharedTokenFromLDAP = ( resolvedSharedTokenFromLDAP!=null ? resolvedSharedTokenFromLDAP.getResolvedAttribute() : null);  
+				
+				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
 					log
 							.info("sharedToken does not exist, will generate a new one.");
-					sharedToken = getSharedToken(resolutionContext);
+					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
 					if (getStoreLdap()) {
 						log
 								.debug("storeLdap=true, will store the SharedToken in LDAP.");
@@ -212,12 +208,13 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 				} else {
 					log
 							.info("sharedToken  exists, will not to generate a new one.");
-					sharedToken = col.iterator().next().toString();
+					sharedToken = sharedTokenFromLDAP.getValues().get(0).getValue().toString();
 				}
 			}
-			BasicAttribute<String> attribute = new BasicAttribute<String>();
-			attribute.setId(getGeneratedAttributeId());
-			attribute.getValues().add(sharedToken);
+			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
+			Collection<IdPAttributeValue<String>> values = new ArrayList<IdPAttributeValue<String>>();
+			values.add(new StringAttributeValue(sharedToken));
+			attribute.setValues(values);
 			attributes.put(attribute.getId(), attribute);
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
@@ -234,14 +231,14 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 * 
 	 * @return sharedToken
 	 * 
-	 * @throws AttributeResolutionException
+	 * @throws ResolutionException
 	 *             thrown if there is a problem retrieving or storing the
 	 *             persistent ID
 	 */
-	private String getSharedToken(ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+	private String getSharedToken(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 
-		String localId = getLocalId(resolutionContext);
+		String localId = getLocalId(resolutionContext, resolverWorkContext);
 		String persistentId = this.createSharedToken(resolutionContext,
 				localId, salt);
 		return persistentId;
@@ -258,17 +255,16 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 */
 
 	private void storeSharedToken(
-			ShibbolethResolutionContext resolutionContext, String sharedToken)
+			AttributeResolutionContext resolutionContext, String sharedToken)
 			throws IMASTException {
 
 		log.info("calling storeSharedToken() ...");
 
 		try {
-			String principalName = resolutionContext
-					.getAttributeRequestContext().getPrincipalName();
+			String principalName = resolutionContext.getPrincipal();
 
 			(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME, sharedToken,
-					getDependencyIds().get(0), principalName, idpHome, subtreeSearch);
+					getDependencies().toArray(new ResolverPluginDependency[0])[0].getDependencyPluginId(), principalName, idpHome, subtreeSearch);
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			log.error("Failed to store sharedToken into LDAP", e);
@@ -290,19 +286,18 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 * 
 	 * @return the created identifier
 	 * 
-	 * @throws AttributeResolutionException
+	 * @throws ResolutionException
 	 *             thrown if there is a problem
 	 */
 	private String createSharedToken(
-			ShibbolethResolutionContext resolutionContext, String localId,
-			byte[] salt) throws AttributeResolutionException {
+			AttributeResolutionContext resolutionContext, String localId,
+			byte[] salt) throws ResolutionException {
 		String persistentId;
 		log.info("creating a sharedToken ...");
 		try {
 			String localEntityId = null;
 			if (this.idpIdentifier == null) {
-				localEntityId = resolutionContext.getAttributeRequestContext()
-						.getLocalEntityId();
+				localEntityId = resolutionContext.getAttributeIssuerID();
 			} else {
 				localEntityId = idpIdentifier;
 			}
@@ -316,7 +311,7 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 			log.info("the created sharedToken: " + persistentId);
 		} catch (Exception e) {
 			log.error("Failed to create the sharedToken", e);
-			throw new AttributeResolutionException("Failed to create the sharedToken", e);
+			throw new ResolutionException("Failed to create the sharedToken", e);
 		}
 		return persistentId;
 
@@ -356,28 +351,33 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 * 
 	 * @return local ID component of the persistent ID
 	 * 
-	 * @throws AttributeResolutionException
+	 * @throws ResolutionException
 	 *             thrown if there is a problem resolving the local id
 	 */
-	private String getLocalId(ShibbolethResolutionContext resolutionContext)
-			throws AttributeResolutionException {
+	private String getLocalId(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
+			throws ResolutionException {
 
 		log.info("gets local ID ...");
 
-		String[] ids = getSourceAttributeId().split(SEPARATOR);
+		String[] ids = getSourceAttribute().split(SEPARATOR);
+		// get list of already resolved attributes (from dependencies)
+		Map <String,ResolvedAttributeDefinition> resolvedAttributesMap = 
+				resolverWorkContext.getResolvedIdPAttributeDefinitions();	
 
 		StringBuffer localIdValue = new StringBuffer();
 		for (int i = 0; i < ids.length; i++) {
+			Collection<IdPAttributeValue<?>> sourceIdValues = null;
+			
+			if (resolvedAttributesMap.get(ids[i]) != null ) 
+				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
 
-			Collection<Object> sourceIdValues = getValuesFromAllDependencies(
-					resolutionContext, ids[i]);
 			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
 				log
 						.error(
 								"Source attribute {} for connector {} provide no values",
-								getSourceAttributeId(), getId());
-				throw new AttributeResolutionException("Source attribute "
-						+ getSourceAttributeId() + " for connector " + getId()
+								getSourceAttribute(), getId());
+				throw new ResolutionException("Source attribute "
+						+ getSourceAttribute() + " for connector " + getId()
 						+ " provided no values");
 			}
 
@@ -385,9 +385,9 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 				log
 						.warn(
 								"Source attribute {} for connector {} has more than one value, only the first value is used",
-								getSourceAttributeId(), getId());
+								getSourceAttribute(), getId());
 			}
-			localIdValue.append(sourceIdValues.iterator().next().toString());
+			localIdValue.append(sourceIdValues.iterator().next().getValue().toString());
 		}
 		log.info("local ID: " + localIdValue.toString());
 
@@ -395,12 +395,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	}
 
 	/** {@inheritDoc} */
-	public void validate() throws AttributeResolutionException {
-		if (getDependencyIds() == null || getDependencyIds().size() != 1) {
-			log.error("Computed ID " + getId()
-					+ " data connectore requires exactly one dependency");
-			throw new AttributeResolutionException("Computed ID " + getId()
-					+ " data connectore requires exactly one dependency");
+	public void validate() throws ResolutionException {
+		if (getDependencies().size() != 1) {
+			log.error("SharedToken ID " + getId()
+					+ " data connector requires exactly one dependency");
+			throw new ResolutionException("SharedToken ID " + getId()
+					+ " data connector requires exactly one dependency");
 		}
 	}
 
@@ -420,8 +420,12 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 	 * @return ID of the attribute whose first value is used when generating the
 	 *         computed ID
 	 */
-	public String getSourceAttributeId() {
+	public String getSourceAttribute() {
 		return sourceAttribute;
+	}
+
+	public void setSourceAttribute(String sourceAttribute) {
+		this.sourceAttribute = sourceAttribute;
 	}
 
 	/**
@@ -455,4 +459,61 @@ public class SharedTokenDataConnector extends BaseDataConnector {
 		this.idpIdentifier = idpIdentifier;
 	}
 
+	public String getGeneratedAttribute() {
+		return generatedAttribute;
+	}
+
+	public void setGeneratedAttribute(String generatedAttribute) {
+		this.generatedAttribute = generatedAttribute;
+	}
+
+	public String getIdpHome() {
+		return idpHome;
+	}
+
+	public void setIdpHome(String idpHome) {
+		this.idpHome = idpHome;
+	}
+
+	public boolean isSubtreeSearch() {
+		return subtreeSearch;
+	}
+
+	public void setSubtreeSearch(boolean subtreeSearch) {
+		this.subtreeSearch = subtreeSearch;
+	}
+
+	public boolean isStoreDatabase() {
+		return storeDatabase;
+	}
+
+	public void setStoreDatabase(boolean storeDatabase) {
+		this.storeDatabase = storeDatabase;
+	}
+
+	public String getPrimaryKeyName() {
+		return primaryKeyName;
+	}
+
+	public void setPrimaryKeyName(String primaryKeyName) {
+		this.primaryKeyName = primaryKeyName;
+	}
+
+	public void setSalt(byte[] salt) {
+		this.salt = salt;
+	}
+
+	public void setStoreLdap(boolean storeLdap) {
+		this.storeLdap = storeLdap;
+	}
+	
+	public void setDataSource(DataSource source) {
+		if (source != null) {
+			stStore = new SharedTokenStore(source);
+		} else {
+			log.error("DataSource should not be null");
+			throw new IllegalArgumentException(
+					"DataSource should not be null");
+		}
+	}
 }

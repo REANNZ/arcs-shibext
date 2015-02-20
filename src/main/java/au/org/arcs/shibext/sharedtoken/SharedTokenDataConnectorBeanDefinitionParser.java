@@ -5,13 +5,14 @@ package au.org.arcs.shibext.sharedtoken;
 
 import java.beans.PropertyVetoException;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import org.opensaml.xml.util.DatatypeHelper;
-import org.opensaml.xml.util.XMLHelper;
+import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
+import net.shibboleth.utilities.java.support.xml.AttributeSupport;
+import net.shibboleth.utilities.java.support.xml.ElementSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanCreationException;
@@ -23,15 +24,12 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import au.org.arcs.shibext.handler.ARCSDataConnectorNamespaceHandler;
 
-import edu.internet2.middleware.shibboleth.common.config.attribute.resolver.dataConnector.BaseDataConnectorBeanDefinitionParser;
-import edu.internet2.middleware.shibboleth.common.config.attribute.resolver.dataConnector.DataConnectorNamespaceHandler;
-
 /**
  * @author Damien Chen
  * 
  */
 public class SharedTokenDataConnectorBeanDefinitionParser extends
-		BaseDataConnectorBeanDefinitionParser {
+		AbstractDataConnectorParser {
 
 	private final Logger log = LoggerFactory
 			.getLogger(SharedTokenDataConnectorBeanDefinitionParser.class);
@@ -42,18 +40,20 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 	/** {@inheritDoc} */
 	@Override
-	protected Class getBeanClass(Element element) {
-		return SharedTokenDataConnectorBeanFactory.class;
+	protected Class<SharedTokenDataConnector> getBeanClass(Element element) {
+		return SharedTokenDataConnector.class;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void doParse(String pluginId, Element pluginConfig,
-			Map<QName, List<Element>> pluginConfigChildren,
-			BeanDefinitionBuilder pluginBuilder, ParserContext parserContext) {
+	//protected void doParse(String pluginId, Element pluginConfig,
+	//		Map<QName, List<Element>> pluginConfigChildren,
+	//		BeanDefinitionBuilder pluginBuilder, ParserContext parserContext) 
+	protected void doParse(Element pluginConfig,
+			ParserContext parserContext,
+			BeanDefinitionBuilder pluginBuilder) {
 
-		super.doParse(pluginId, pluginConfig, pluginConfigChildren,
-				pluginBuilder, parserContext);
+		super.doParse(pluginConfig, parserContext, pluginBuilder);
 
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
 			pluginBuilder.addPropertyValue("generatedAttribute", pluginConfig
@@ -73,7 +73,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "storeLdap")) {
-			pluginBuilder.addPropertyValue("storeLdap", XMLHelper
+			pluginBuilder.addPropertyValue("storeLdap", AttributeSupport
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeLdap")));
 		} else {
@@ -81,7 +81,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "subtreeSearch")) {
-			pluginBuilder.addPropertyValue("subtreeSearch", XMLHelper
+			pluginBuilder.addPropertyValue("subtreeSearch", AttributeSupport
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "subtreeSearch")));
 		} else {
@@ -94,15 +94,15 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 				null, "salt").getBytes());
 
 		if (pluginConfig.hasAttributeNS(null, "storeDatabase")) {
-			pluginBuilder.addPropertyValue("storeDatabase", XMLHelper
+			pluginBuilder.addPropertyValue("storeDatabase", AttributeSupport
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeDatabase")));
 		} else {
 			pluginBuilder.addPropertyValue("storeDatabase", false);
 		}
 
-		DataSource connectionSource = processConnectionManagement(pluginId,
-				pluginConfigChildren, pluginBuilder);
+		DataSource connectionSource = processConnectionManagement(pluginConfig, parserContext,
+				pluginBuilder);
 		pluginBuilder.addPropertyValue("dataSource", connectionSource);
 
 	}
@@ -119,25 +119,25 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	 * 
 	 * @return data source built from configuration
 	 */
-	protected DataSource processConnectionManagement(String pluginId,
-			Map<QName, List<Element>> pluginConfigChildren,
+	protected DataSource processConnectionManagement(Element pluginConfig,
+			ParserContext parserContext,
 			BeanDefinitionBuilder pluginBuilder) {
 
 		DataSource ds = null;
 
 		try {
-			List<Element> le = pluginConfigChildren.get(new QName(
-					ARCSDataConnectorNamespaceHandler.NAMESPACE,
-					"DatabaseConnection"));
+			// NOTE: the DatabaseConnection element is intentionally 
+			// in the ARCS namespace as it has a slightly different 
+			// syntax then what's defined within urn:mace:shibboleth:2.0:resolver:dc
+			// NOTE: only first element is parsed.
+			List<Element> le = ElementSupport.getChildElements(pluginConfig,
+					new QName(ARCSDataConnectorNamespaceHandler.NAMESPACE,
+							"DatabaseConnection"));
 			if (le != null) {
 				ds = buildDatabaseConnection(
-						pluginId,
+						pluginConfig,
 						pluginBuilder,
-						pluginConfigChildren
-								.get(
-										new QName(
-												ARCSDataConnectorNamespaceHandler.NAMESPACE,
-												"DatabaseConnection")).get(0));
+						le.get(0));
 			} else {
 				log
 						.info("DatabaseConnection element is not set in SharedToken data connector");
@@ -162,8 +162,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	 * 
 	 * @return the built data source
 	 */
-	protected DataSource buildDatabaseConnection(String pluginId,
-			BeanDefinitionBuilder pluginBuilder, Element dbc) {
+	protected DataSource buildDatabaseConnection(Element pluginConfig, BeanDefinitionBuilder pluginBuilder, Element dbc) {
 
 		if (dbc.hasAttributeNS(null, "primaryKeyName")) {
 			pluginBuilder.addPropertyValue("primaryKeyName", dbc
@@ -173,7 +172,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 
 		ComboPooledDataSource datasource = new ComboPooledDataSource();
-		String driverClass = DatatypeHelper.safeTrim(dbc.getAttributeNS(null,
+		String driverClass = MiscHelper.safeTrim(dbc.getAttributeNS(null,
 				"jdbcDriver"));
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		try {
@@ -193,21 +192,21 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 					+ "?autoReconnect=true"));
 			*/
 			
-			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
+			datasource.setJdbcUrl(MiscHelper.safeTrim(dbc.getAttributeNS(
 					null, "jdbcURL")));
 
-			datasource.setUser(DatatypeHelper.safeTrim(dbc.getAttributeNS(null,
+			datasource.setUser(MiscHelper.safeTrim(dbc.getAttributeNS(null,
 					"jdbcUserName")));
-			datasource.setPassword(DatatypeHelper.safeTrim(dbc.getAttributeNS(
+			datasource.setPassword(MiscHelper.safeTrim(dbc.getAttributeNS(
 					null, "jdbcPassword")));
 
-			log.debug("Created data source for data connector {}", pluginId);
+			log.debug("Created data source for data connector {}", pluginConfig.getAttribute("id"));
 			return datasource;
 		} catch (PropertyVetoException e) {
 			log
 					.error(
 							"Unable to create data source for data connector {} with JDBC driver class {}",
-							pluginId, driverClass);
+							pluginConfig.getAttribute("id"), driverClass);
 			return null;
 		}
 

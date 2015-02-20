@@ -3,10 +3,9 @@
  */
 package au.org.arcs.shibext.targetedid;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.xml.namespace.QName;
+
+import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -14,14 +13,12 @@ import org.w3c.dom.Element;
 
 import au.org.arcs.shibext.handler.ARCSDataConnectorNamespaceHandler;
 
-import edu.internet2.middleware.shibboleth.common.config.attribute.resolver.dataConnector.BaseDataConnectorBeanDefinitionParser;
-
 /**
  * @author Damien Chen
  *
  */
 public class TargetedIDDataConnectorBeanDefinitionParser extends
-		BaseDataConnectorBeanDefinitionParser {
+		AbstractDataConnectorParser {
 
 	/** Schema type name. */
 	public static final QName TYPE_NAME = new QName(
@@ -29,18 +26,18 @@ public class TargetedIDDataConnectorBeanDefinitionParser extends
 
 	/** {@inheritDoc} */
 	@Override
-	protected Class getBeanClass(Element element) {
-		return TargetedIDDataConnectorBeanFactory.class;
+	protected Class<TargetedIDDataConnector> getBeanClass(Element element) {
+		return TargetedIDDataConnector.class;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void doParse(String pluginId, Element pluginConfig,
-			Map<QName, List<Element>> pluginConfigChildren,
-			BeanDefinitionBuilder pluginBuilder, ParserContext parserContext) {
+	protected void doParse(Element pluginConfig,
+			ParserContext parserContext,
+			BeanDefinitionBuilder pluginBuilder) {
 
-		super.doParse(pluginId, pluginConfig, pluginConfigChildren,
-				pluginBuilder, parserContext);
+		super.doParse(pluginConfig, parserContext,
+				pluginBuilder);
 
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
 			pluginBuilder.addPropertyValue("generatedAttribute", pluginConfig
