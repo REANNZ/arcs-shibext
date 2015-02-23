@@ -5,12 +5,25 @@ package au.org.arcs.shibext.sharedtoken;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.ldaptive.AttributeModification;
+import org.ldaptive.AttributeModificationType;
+import org.ldaptive.Connection;
+import org.ldaptive.LdapAttribute;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.Response;
+import org.ldaptive.ResultCode;
+import org.ldaptive.SearchResult;
+import org.ldaptive.provider.ProviderConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +31,8 @@ import net.shibboleth.idp.attribute.resolver.AbstractDataConnector;
 import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
+import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.ExecutableSearchFilter;
+import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.LDAPDataConnector;
 import net.shibboleth.idp.attribute.resolver.ResolutionException;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
@@ -48,11 +63,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	private String idpIdentifier;
 
 	/**
-	 * IdP home directory used when getting the IdP's configuration.
-	 */
-	private String idpHome;
-
-	/**
 	 * ID of the attribute whose first value is used when generating the
 	 * computed ID.
 	 */
@@ -63,9 +73,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
-
-	/** Whether to search subtree when store the SharedToken */
-	private boolean subtreeSearch;
 
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
@@ -95,8 +102,8 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	 *            Whether to store the sharedToken to Ldap
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
-			String sourceAttributeId, byte[] idSalt, boolean storeLdap,
-			boolean subtreeSearch, String idpIdentifier, String idpHome,
+			String sourceAttributeId, byte[] idSalt, 
+			String idpIdentifier, boolean storeLdap,
 			boolean storeDatabase, DataSource source, String primaryKeyName) {
 
 		try {
@@ -120,9 +127,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			}
 			setSalt(idSalt);
 			setIdpIdentifier(idpIdentifier);
-			setIdpHome(idpHome);
 			setStoreLdap(storeLdap);
-			setSubtreeSearch(subtreeSearch);
 			setPrimaryKeyName(primaryKeyName);
 			setStoreDatabase(storeDatabase);
 
@@ -201,7 +206,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					if (getStoreLdap()) {
 						log
 								.debug("storeLdap=true, will store the SharedToken in LDAP.");
-						storeSharedToken(resolutionContext, sharedToken);
+						storeSharedToken(resolutionContext, resolverWorkContext, sharedToken);
 					} else
 						log
 								.info("storeLdap=false, not to store sharedToken in Ldap");
@@ -246,7 +251,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	}
 
 	/**
-	 * Store the sharedToken.
+	 * Store the sharedToken in LDAP.
 	 * 
 	 * @param resolutionContext
 	 *            current resolution context
@@ -255,22 +260,74 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	 */
 
 	private void storeSharedToken(
-			AttributeResolutionContext resolutionContext, String sharedToken)
+			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext, String sharedToken)
 			throws IMASTException {
 
 		log.info("calling storeSharedToken() ...");
 
-		try {
-			String principalName = resolutionContext.getPrincipal();
+		try {		
+			// store the sharedToken value in LDAP, using the configured data connector
+			
+			// get the ID of the data connector - by definition, that should be the ID of the first and only dependency.
+			if (getDependencies().size() != 1) throw new IMASTException(
+					"SharedTokenDataConnector must have exactly one dependency of type dc:LDAPDirectory");
+			String ldapDcId = getDependencies().toArray(new ResolverPluginDependency[0])[0].getDependencyPluginId();
+			
+			// get the LDAP connector itself
+			
+			LDAPDataConnector ldapDc = (LDAPDataConnector)resolverWorkContext.getResolvedDataConnectors().get(ldapDcId).getResolvedConnector();
+			
 
-			(new LdapUtil()).saveAttribute(STORED_ATTRIBUTE_NAME, sharedToken,
-					getDependencies().toArray(new ResolverPluginDependency[0])[0].getDependencyPluginId(), principalName, idpHome, subtreeSearch);
+			// We need to construct a map of resolved attribute values in order to construct a search filter.  
+					
+			// uh, can we get this structure easier or do we need to build it?
+			Map<String, List<IdPAttributeValue<?>>> resolvedAttributeValues = new TreeMap<String,List<IdPAttributeValue<?>>>();
+			Map<String, IdPAttribute> resolvedAttributes = resolutionContext.getResolvedIdPAttributes(); 
+			for (Iterator<String> itAttr = resolvedAttributes.keySet().iterator(); itAttr.hasNext(); ) {
+				String attrKey = itAttr.next();						
+			    resolvedAttributeValues.put(attrKey, resolvedAttributes.get(attrKey).getValues());
+			}
+			
+			// now we can construct a search filter 
+			ExecutableSearchFilter sf = ldapDc.getExecutableSearchBuilder().build(resolutionContext, resolvedAttributeValues);
+			SearchResult sr = sf.execute(ldapDc.getSearchExecutor(), ldapDc.getConnectionFactory());
+			if ( sr.size() == 0 ) throw new IMASTException("No search results found - cannot store sharedToken");
+			String targetDn = null;
+			for (Iterator<LdapEntry> itSr = sr.getEntries().iterator(); itSr.hasNext(); ) {
+				LdapEntry srEntry = itSr.next();
+				log.debug("Search Result Entry DN is {}", srEntry.getDn());
+				targetDn = srEntry.getDn();
+		    }
+			if ( sr.size() > 1 ) {
+				log.warn("Multiple search results found, only last one will be updated ({})", targetDn);
+			}
+			
+			// now construct a Modify operation
+			ModifyRequest mr = new ModifyRequest(targetDn, 
+					new AttributeModification(AttributeModificationType.ADD, 
+							new LdapAttribute(STORED_ATTRIBUTE_NAME, sharedToken)));
+
+			log.info("adding {}:{} to {}:{}", STORED_ATTRIBUTE_NAME, sharedToken,
+					ldapDcId, targetDn);			
+
+			// and get a connection and apply the modify operation
+			Connection ldapConn = ldapDc.getConnectionFactory().getConnection();
+			checkLdapResponse(ldapConn.open());
+			ProviderConnection conn = ldapConn.getProviderConnection();
+			checkLdapResponse(conn.modify(mr));
+			ldapConn.close();
+
 		} catch (Exception e) {
 			// catch any exception, the program will go on.
 			log.error("Failed to store sharedToken into LDAP", e);
 			throw new IMASTException("Failed to save attribute into ldap entry", e);
 
 		}
+	}
+
+	private void checkLdapResponse(Response<Void> ldapResponse) throws IMASTException {
+		if (ldapResponse.getResultCode()!=ResultCode.SUCCESS)
+			throw new IMASTException("LDAP response was not SUCCESS but " + ldapResponse.getResultCode().toString() + " " + ldapResponse.getMessage());
 	}
 
 	/**
@@ -465,22 +522,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	public void setGeneratedAttribute(String generatedAttribute) {
 		this.generatedAttribute = generatedAttribute;
-	}
-
-	public String getIdpHome() {
-		return idpHome;
-	}
-
-	public void setIdpHome(String idpHome) {
-		this.idpHome = idpHome;
-	}
-
-	public boolean isSubtreeSearch() {
-		return subtreeSearch;
-	}
-
-	public void setSubtreeSearch(boolean subtreeSearch) {
-		this.subtreeSearch = subtreeSearch;
 	}
 
 	public boolean isStoreDatabase() {

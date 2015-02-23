@@ -74,26 +74,11 @@
 					</annotation>
 				</attribute>
 				
-				<attribute name="subtreeSearch" type="boolean">
-					<annotation>
-						<documentation>
-							Whether to search subtree when store the SharedToken.
-						</documentation>
-					</annotation>
-				</attribute>
-				
 				<attribute name="idpIdentifier" type="string">
 					<annotation>
 						<documentation>
 							IdP indentifier, used in the SharedToken.
 							Defaults to IdP entityID.
-						</documentation>
-					</annotation>
-				</attribute>
-				<attribute name="idpHome" type="string">
-					<annotation>
-						<documentation>
-							The absolute path of IdP home directory.
 						</documentation>
 					</annotation>
 				</attribute>

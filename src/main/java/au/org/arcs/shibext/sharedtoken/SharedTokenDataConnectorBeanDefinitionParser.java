@@ -46,9 +46,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 	/** {@inheritDoc} */
 	@Override
-	//protected void doParse(String pluginId, Element pluginConfig,
-	//		Map<QName, List<Element>> pluginConfigChildren,
-	//		BeanDefinitionBuilder pluginBuilder, ParserContext parserContext) 
 	protected void doParse(Element pluginConfig,
 			ParserContext parserContext,
 			BeanDefinitionBuilder pluginBuilder) {
@@ -67,10 +64,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("idpIdentifier", pluginConfig
 					.getAttributeNS(null, "idpIdentifier"));
 		}
-		if (pluginConfig.hasAttributeNS(null, "idpHome")) {
-			pluginBuilder.addPropertyValue("idpHome", pluginConfig
-					.getAttributeNS(null, "idpHome"));
-		}
 
 		if (pluginConfig.hasAttributeNS(null, "storeLdap")) {
 			pluginBuilder.addPropertyValue("storeLdap", AttributeSupport
@@ -78,14 +71,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 							.getAttributeNodeNS(null, "storeLdap")));
 		} else {
 			pluginBuilder.addPropertyValue("storeLdap", true);
-		}
-
-		if (pluginConfig.hasAttributeNS(null, "subtreeSearch")) {
-			pluginBuilder.addPropertyValue("subtreeSearch", AttributeSupport
-					.getAttributeValueAsBoolean(pluginConfig
-							.getAttributeNodeNS(null, "subtreeSearch")));
-		} else {
-			pluginBuilder.addPropertyValue("subtreeSearch", true);
 		}
 
 		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
