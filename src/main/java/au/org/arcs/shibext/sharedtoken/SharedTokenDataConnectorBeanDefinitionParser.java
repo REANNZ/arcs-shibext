@@ -53,10 +53,10 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		super.doParse(pluginConfig, parserContext, pluginBuilder);
 
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
-			pluginBuilder.addPropertyValue("generatedAttribute", pluginConfig
+			pluginBuilder.addPropertyValue("generatedAttributeId", pluginConfig
 					.getAttributeNS(null, "generatedAttributeID"));
 		} else {
-			pluginBuilder.addPropertyValue("generatedAttribute",
+			pluginBuilder.addPropertyValue("generatedAttributeId",
 					"auEduPersonSharedToken");
 		}
 
@@ -73,7 +73,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeLdap", true);
 		}
 
-		pluginBuilder.addPropertyValue("sourceAttribute", pluginConfig
+		pluginBuilder.addPropertyValue("sourceAttributeId", pluginConfig
 				.getAttributeNS(null, "sourceAttributeID"));
 		pluginBuilder.addPropertyValue("salt", pluginConfig.getAttributeNS(
 				null, "salt").getBytes());
