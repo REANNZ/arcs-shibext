@@ -361,7 +361,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			String globalUniqueID = localId + localEntityId + new String(salt);
 			log.info("the globalUniqueID (user/idp/salt): " + localId + " / "
 					+ localEntityId + " / " + new String(salt));
-			byte[] hashValue = DigestUtils.sha(globalUniqueID);
+			byte[] hashValue = DigestUtils.sha1(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
 			persistentId = this.replace(persistentId);

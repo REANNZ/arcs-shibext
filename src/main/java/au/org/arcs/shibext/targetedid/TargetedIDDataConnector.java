@@ -214,7 +214,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 					+ new String(salt);
 			log.info("the uniqueID (user/IdP/SP/salt) : " + localId + " / "
 					+ localEntityID + " / " + peerEntityID + " / " + new String(salt));
-			byte[] hashValue = DigestUtils.sha(globalUniqueID);
+			byte[] hashValue = DigestUtils.sha1(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			targetedID = new String(encodedValue);
 			targetedID = this.replace(targetedID);
