@@ -169,6 +169,11 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						+ " data connector requires a Database Connection when storedatabase=true");
 			}
 		}
+		// log a warning if both storeldap=false and storedatabase=false
+		if (!storeDatabase && !getStoreLdap()) {
+			log.warn("SharedTokenDataConnector {} is configured to store values neither in database nor in LDAP.  SharedToken values generated on the fly SHOULD NOT be used in production systems.", getId());
+		}
+		
 		// log a warning if any of the attributes listed in getSourceAttributeId() cannot be found in the getDependencies() Set
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 		for (int i = 0; i < ids.length; i++) {
