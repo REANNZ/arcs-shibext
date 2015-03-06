@@ -74,9 +74,8 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "ldapConnectorId")) {
-			pluginBuilder.addPropertyValue("ldapConnectorId", AttributeSupport
-					.getAttributeValueAsBoolean(pluginConfig
-							.getAttributeNodeNS(null, "ldapConnectorId")));
+			pluginBuilder.addPropertyValue("ldapConnectorId", pluginConfig
+					.getAttributeNS(null, "ldapConnectorId"));
 		}
 		
 		pluginBuilder.addPropertyValue("sourceAttributeId", pluginConfig

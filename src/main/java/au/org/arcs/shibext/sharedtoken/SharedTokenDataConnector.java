@@ -142,6 +142,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	@Override
 	protected void doInitialize() throws ComponentInitializationException {
 		super.doInitialize();
+		log.debug("Initialize called on SharedTokenDataConnector {}", getId());
 		
 		if (MiscHelper.isEmpty(sourceAttributeId)) 
 			throw new ComponentInitializationException(
