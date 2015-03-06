@@ -73,7 +73,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
-				
+				<attribute name="ldapConnectorId" type="string">
+					<annotation>
+						<documentation>
+							ID of the LDAPDataConnector to use if storing values in LDAP.
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="idpIdentifier" type="string">
 					<annotation>
 						<documentation>

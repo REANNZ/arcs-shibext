@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.sql.DataSource;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import net.shibboleth.idp.attribute.resolver.AbstractDataConnector;
 import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
+import net.shibboleth.idp.attribute.resolver.ResolvedDataConnector;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
 import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.ExecutableSearchFilter;
@@ -78,6 +80,9 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	/** Whether to store the sharedToken to Ldap */
 	private boolean storeLdap;
 
+	/** ID of the LDAPDataConnector to use if storing values in LDAP */
+	private String ldapConnectorId;
+	
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
 
@@ -145,6 +150,32 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (MiscHelper.isEmpty(generatedAttributeId)) 
 			throw new ComponentInitializationException(
 					"Generated attribute ID must be set and not empty");
+		
+		if (getStoreLdap()) {
+			if (getLdapConnectorId() == null) {
+				throw new ComponentInitializationException("SharedToken ID " + getId()
+						+ " data connector requires an Ldap Connector ID when storeLdap=true");
+			}
+			// check getLdapConnectorId() can be found in the getDependencies() Set
+			if (!dependenciesContainsId(getDependencies(), getLdapConnectorId())) {
+				throw new ComponentInitializationException("SharedToken ID " + getId()
+						+ " is configured to use LDAP connector ID " + getLdapConnectorId()
+						+ " but the connector is not listed in dependencies");
+			}
+		}
+		if (storeDatabase) {
+			if (stStore == null) {
+				throw new ComponentInitializationException("SharedToken ID " + getId()
+						+ " data connector requires a Database Connection when storedatabase=true");
+			}
+		}
+		// log a warning if any of the attributes listed in getSourceAttributeId() cannot be found in the getDependencies() Set
+		String[] ids = getSourceAttributeId().split(SEPARATOR);
+		for (int i = 0; i < ids.length; i++) {
+			if (!dependenciesContainsId(getDependencies(), ids[i])) {
+				log.warn("Source attribute ID {} not listed in dependencies of connector {}", ids[i], getId());
+			}			
+		}
 
 	}
 	
@@ -200,7 +231,9 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			} else {
 				log
 						.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
-				// TODO-CHECK: get already resolved attribute (from LDAP)
+				// TODO-CHECK-THIS-WORKS: get already resolved attribute (from LDAP)
+				// TODO-CHECK: do we need to list the (LDAP) attribute as an explicit dependency?  
+				// Would we then get an ID clash with the attribute definition through this connector?
 				ResolvedAttributeDefinition resolvedSharedTokenFromLDAP = 
 						resolverWorkContext.getResolvedIdPAttributeDefinitions().get(STORED_ATTRIBUTE_NAME);
 				IdPAttribute sharedTokenFromLDAP = ( resolvedSharedTokenFromLDAP!=null ? resolvedSharedTokenFromLDAP.getResolvedAttribute() : null);  
@@ -212,7 +245,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					if (getStoreLdap()) {
 						log
 								.debug("storeLdap=true, will store the SharedToken in LDAP.");
-						storeSharedToken(resolutionContext, resolverWorkContext, sharedToken);
+						storeSharedTokenInLdap(resolutionContext, resolverWorkContext, sharedToken);
 					} else
 						log
 								.info("storeLdap=false, not to store sharedToken in Ldap");
@@ -265,7 +298,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	 * 
 	 */
 
-	private void storeSharedToken(
+	private void storeSharedTokenInLdap(
 			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext, String sharedToken)
 			throws IMASTException {
 
@@ -273,17 +306,15 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 		try {		
 			// store the sharedToken value in LDAP, using the configured data connector
+					
+			// get the LDAP connector
+			ResolvedDataConnector ldapDcResolved = resolverWorkContext.getResolvedDataConnectors().get(getLdapConnectorId());
+			if (ldapDcResolved == null) {
+			    log.error("LDAPDataConnector {} not found in resolverWorkContext.getResolvedDataConnectors()", getLdapConnectorId());
+			    throw new IMASTException("LDAPDataConnector "+getLdapConnectorId()+" not found in resolverWorkContext.getResolvedDataConnectors()");
+			}
+			LDAPDataConnector ldapDc = (LDAPDataConnector)ldapDcResolved.getResolvedConnector();
 			
-			// get the ID of the data connector - by definition, that should be the ID of the first and only dependency.
-			if (getDependencies().size() != 1) throw new IMASTException(
-					"SharedTokenDataConnector must have exactly one dependency of type dc:LDAPDirectory");
-			String ldapDcId = getDependencies().toArray(new ResolverPluginDependency[0])[0].getDependencyPluginId();
-			
-			// get the LDAP connector itself
-			
-			LDAPDataConnector ldapDc = (LDAPDataConnector)resolverWorkContext.getResolvedDataConnectors().get(ldapDcId).getResolvedConnector();
-			
-
 			// We need to construct a map of resolved attribute values in order to construct a search filter.  
 					
 			// uh, can we get this structure easier or do we need to build it?
@@ -314,7 +345,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 							new LdapAttribute(STORED_ATTRIBUTE_NAME, sharedToken)));
 
 			log.info("adding {}:{} to {}:{}", STORED_ATTRIBUTE_NAME, sharedToken,
-					ldapDcId, targetDn);			
+					getLdapConnectorId(), targetDn);			
 
 			// and get a connection and apply the modify operation
 			Connection ldapConn = ldapDc.getConnectionFactory().getConnection();
@@ -438,9 +469,9 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				log
 						.error(
 								"Source attribute {} for connector {} provide no values",
-								getSourceAttributeId(), getId());
+								ids[i], getId());
 				throw new ResolutionException("Source attribute "
-						+ getSourceAttributeId() + " for connector " + getId()
+						+ ids[i] + " for connector " + getId()
 						+ " provided no values");
 			}
 
@@ -448,7 +479,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				log
 						.warn(
 								"Source attribute {} for connector {} has more than one value, only the first value is used",
-								getSourceAttributeId(), getId());
+								ids[i], getId());
 			}
 			localIdValue.append(sourceIdValues.iterator().next().getValue().toString());
 		}
@@ -456,15 +487,12 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 		return localIdValue.toString();
 	}
-
-	/** {@inheritDoc} */
-	public void validate() throws ResolutionException {
-		if (getDependencies().size() != 1) {
-			log.error("SharedToken ID " + getId()
-					+ " data connector requires exactly one dependency");
-			throw new ResolutionException("SharedToken ID " + getId()
-					+ " data connector requires exactly one dependency");
+	
+	private boolean dependenciesContainsId(Set<ResolverPluginDependency> dependencies, String id) {
+		for (Iterator<ResolverPluginDependency> it=dependencies.iterator(); it.hasNext(); ) {
+			if (it.next().getDependencyPluginId().equals(id)) return true;
 		}
+		return false;
 	}
 
 	/**
@@ -572,4 +600,19 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					"DataSource should not be null");
 		}
 	}
+
+	/**
+	 * @return the ldapConnectorId
+	 */
+	public String getLdapConnectorId() {
+		return ldapConnectorId;
+	}
+
+	/**
+	 * @param ldapConnectorId the ldapConnectorId to set
+	 */
+	public void setLdapConnectorId(String ldapConnectorId) {
+		this.ldapConnectorId = ldapConnectorId;
+	}
+
 }
