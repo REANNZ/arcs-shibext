@@ -179,20 +179,16 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
 			
 			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
-				log
-						.error(
-								"Source attribute {} for connector {} provide no values",
-								getSourceAttributeId(), getId());
+				log.error("Source attribute {} for connector {} provide no values",
+						getSourceAttributeId(), getId());
 				throw new ResolutionException("Source attribute "
 						+ getSourceAttributeId() + " for connector " + getId()
 						+ " provided no values");
 			}
 
 			if (sourceIdValues.size() > 1) {
-				log
-						.warn(
-								"Source attribute {} for connector {} has more than one value, only the first value is used",
-								getSourceAttributeId(), getId());
+				log.warn("Source attribute {} for connector {} has more than one value, only the first value is used",
+						getSourceAttributeId(), getId());
 			}
 			localIdValue.append(sourceIdValues.iterator().next().toString());
 		}

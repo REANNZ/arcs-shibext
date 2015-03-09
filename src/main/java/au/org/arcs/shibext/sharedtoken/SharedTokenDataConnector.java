@@ -243,8 +243,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					log.debug("sharedToken exists, will not generate a new one.");
 				}
 			} else {
-				log
-						.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
+				log.debug("storeDatabase = false. Try to get SharedToken from LDAP.");
 
 				if (log.isTraceEnabled()) {
 					// DEBUG: dump list of visible attributes
