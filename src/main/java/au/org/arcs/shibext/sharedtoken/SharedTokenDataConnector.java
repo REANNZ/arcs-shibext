@@ -262,7 +262,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						}
 					}
 					
-					// TODO: DEBUG: iterate over all resolved connectors and dump their resolved attributes and values
+					// DEBUG: iterate over all resolved connectors and dump their resolved attributes and values
 					Map <String, ResolvedDataConnector> resolvedDataConnectors = resolverWorkContext.getResolvedDataConnectors();
 					for (Iterator<String> dcIt = resolvedDataConnectors.keySet().iterator(); dcIt.hasNext(); ) {
 						String dcId = dcIt.next();
