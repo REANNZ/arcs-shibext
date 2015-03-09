@@ -297,14 +297,16 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					sharedToken = sharedTokenFromLDAP.getValues().get(0).getValue().toString();
 				}
 			}
+		} catch (Exception e) {
+			// catch any exception so that the IdP will not screw up.
+			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME, e);
+		}
+		if (sharedToken != null) {
 			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
 			Collection<IdPAttributeValue<String>> values = new ArrayList<IdPAttributeValue<String>>();
 			values.add(new StringAttributeValue(sharedToken));
 			attribute.setValues(values);
-			attributes.put(attribute.getId(), attribute);
-		} catch (Exception e) {
-			// catch any exception so that the IdP will not screw up.
-			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME, e);
+			attributes.put(attribute.getId(), attribute);			
 		}
 		return attributes;
 	}
