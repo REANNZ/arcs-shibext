@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -410,6 +411,25 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (ldapResponse.getResultCode()!=ResultCode.SUCCESS)
 			throw new IMASTException("LDAP response was not SUCCESS but " + ldapResponse.getResultCode().toString() + " " + ldapResponse.getMessage());
 	}
+	
+	/**
+	 * Returns a printable form of a local ID.
+	 * 
+	 * If the local ID is just alphanumeric, return the local ID.
+	 * 
+	 * Otherwise, return the local ID base 64 encoded.
+	 * 
+	 * This is a workaround for AD setups where local ID would be 
+	 * based on objectGUID - which is binary but the LDAP configuration
+	 * not always renders it as such - and would then be putting binary 
+	 * data into the log file. 
+	 */
+	private String printableLocalId(String localId) {
+		if (Pattern.matches("^[a-zA-Z0-9@\\\\]+$", localId))
+			return localId;	
+		else
+			return Base64.encodeBase64String(localId.getBytes());
+	}
 
 	/**
 	 * Creates the sharedToken that is unique and persistent within a federation
@@ -440,14 +460,17 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				localEntityId = idpIdentifier;
 			}
 			String globalUniqueID = localId + localEntityId + new String(salt);
-			log.debug("the globalUniqueID (user/idp/salt): " + localId + " / "
+			log.debug("the globalUniqueID (user/idp/salt): " + printableLocalId(localId) + " / "
 					+ localEntityId + " / " + new String(salt));
 			byte[] hashValue = DigestUtils.sha1(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
 			persistentId = this.replace(persistentId);
 			log.debug("the created sharedToken: " + persistentId);
-			log.info("Created a new shared token value {} for user {}", persistentId, localId);
+			if (log.isInfoEnabled()) {
+			    log.info("Created a new shared token value {} for localId {}", persistentId, printableLocalId(localId));
+			}
+			
 		} catch (Exception e) {
 			log.error("Failed to create the sharedToken", e);
 			throw new ResolutionException("Failed to create the sharedToken", e);
@@ -524,7 +547,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			}
 			localIdValue.append(sourceIdValues.iterator().next().getValue().toString());
 		}
-		log.debug("local ID: " + localIdValue.toString());
+		log.debug("local ID: " + printableLocalId(localIdValue.toString()));
 
 		return localIdValue.toString();
 	}
