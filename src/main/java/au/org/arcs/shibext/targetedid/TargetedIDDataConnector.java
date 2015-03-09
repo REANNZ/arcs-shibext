@@ -54,7 +54,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 
 	public TargetedIDDataConnector() {
 		super();
-		log.info("construct empty TargetedIDDataConnector ...");
+		log.debug("construct empty TargetedIDDataConnector ...");
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 			String sourceAttributeId, byte[] idSalt) {
 
 		try {
-			log.info("construct TargetedIDDataConnector ...");
+			log.debug("construct TargetedIDDataConnector ...");
 			setGeneratedAttributeId(generatedAttributeId);
 			setSourceAttributeId(sourceAttributeId);
 			setSalt(idSalt);
@@ -109,7 +109,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
 			throws ResolutionException {
 		
-		log.info("starting TargetedIDDataConnector.resolve( ) ...");
+		log.debug("starting TargetedIDDataConnector.resolve( ) ...");
 
 		Map<String, IdPAttribute> attributes = new LazyMap<String, IdPAttribute>();
 
@@ -162,7 +162,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 	 */
 	private String getLocalId(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
 			throws ResolutionException {
-		log.info("gets local ID ...");
+		log.debug("gets local ID ...");
 
 		StringBuffer localIdValue = new StringBuffer();
 
@@ -196,7 +196,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 			}
 			localIdValue.append(sourceIdValues.iterator().next().toString());
 		}
-		log.info("local ID: " + localIdValue.toString());
+		log.debug("local ID: " + localIdValue.toString());
 
 		return localIdValue.toString();
 	}
@@ -218,7 +218,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, String localId,
 			byte[] salt) throws ResolutionException {
 
-		log.info("creating targetedID");
+		log.debug("creating targetedID");
 		String targetedID = null;
 
 		try {

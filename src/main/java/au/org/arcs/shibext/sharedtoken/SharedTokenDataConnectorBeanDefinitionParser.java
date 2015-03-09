@@ -129,8 +129,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 						pluginBuilder,
 						le.get(0));
 			} else {
-				log
-						.info("DatabaseConnection element is not set in SharedToken data connector");
+				log.info("DatabaseConnection element is not set in SharedToken data connector");
 
 			}
 
@@ -168,8 +167,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		try {
 			classLoader.loadClass(driverClass);
 		} catch (ClassNotFoundException e) {
-			log
-					.error("Unable to create relational database connector, JDBC driver can not be found on the classpath");
+			log.error("Unable to create relational database connector, JDBC driver can not be found on the classpath");
 			throw new BeanCreationException(
 					"Unable to create relational database connector, JDBC driver can not be found on the classpath");
 		}
@@ -193,10 +191,9 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			log.debug("Created data source for data connector {}", pluginConfig.getAttribute("id"));
 			return datasource;
 		} catch (PropertyVetoException e) {
-			log
-					.error(
-							"Unable to create data source for data connector {} with JDBC driver class {}",
-							pluginConfig.getAttribute("id"), driverClass);
+			log.error(
+					"Unable to create data source for data connector {} with JDBC driver class {}",
+					pluginConfig.getAttribute("id"), driverClass);
 			return null;
 		}
 

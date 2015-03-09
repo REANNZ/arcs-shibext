@@ -75,14 +75,14 @@ public class SharedTokenStore {
 			log.error("Failed to get SharedToken from database", e);
 			throw new IMASTException("Failed to get SharedToken from database", e);
 		}
-		log.info("SharedToken : " + sharedToken);
+		log.debug("SharedTokenStore: found value {} for uid {}", sharedToken, uid);
 
 		return sharedToken;
 	}
 
 	public void storeSharedToken(String uid, String sharedToken,
 			String primaryKeyName) throws IMASTException {
-		log.debug("calling storeSharedToken ...");
+		log.info("SharedTokenStore: storing value {} for uid {}", sharedToken, uid);
 		Connection conn = null;
 		// PreparedStatement st = null;
 		Statement st = null;

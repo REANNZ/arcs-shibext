@@ -94,7 +94,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	public SharedTokenDataConnector() {
 		super();
-		log.info("construct empty SharedTokenDataConnector ...");
+		log.debug("construct empty SharedTokenDataConnector ...");
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			boolean storeDatabase, DataSource source, String primaryKeyName) {
 
 		try {
-			log.info("construct SharedTokenDataConnector ...");
+			log.debug("construct SharedTokenDataConnector ...");
 			setGeneratedAttributeId(generatedAttributeId);
 			setSourceAttributeId(sourceAttributeId);
 			setSalt(idSalt);
@@ -184,7 +184,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		
 		// also log a warning if both are true
 		if (storeDatabase && getStoreLdap()) {
-			log.warn("SharedTokenDataConnector {} is configured to store values both in database and in LDAP.  The database settings have higher preference and LDAP will NOT be consulted for sharedToken values.", getId());
+			log.warn("SharedTokenDataConnector {} is configured to store values both in database and in LDAP.  The database setting have higher precedence and LDAP will NOT be consulted for sharedToken values.", getId());
 		}
 		
 		// log a warning if any of the attributes listed in getSourceAttributeId() cannot be found in the getDependencies() Set
@@ -213,15 +213,14 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
 			throws ResolutionException {
 
-		log.info("starting SharedTokenDataConnector.resolve( ) ...");
+		log.debug("starting SharedTokenDataConnector.resolve( ) ...");
 
 		Map<String, IdPAttribute> attributes = new LazyMap<String, IdPAttribute>();
 
 		String sharedToken = null;
 		try {
 			if (storeDatabase) {
-				log
-						.info("storeDatabase = true. Try to get SharedToken from database");
+				log.debug("storeDatabase = true. Try to get SharedToken from database");
 				// Collection<Object> colUid =
 				// super.getValuesFromAllDependencies(
 				// resolutionContext, PRIMARY_KEY);
@@ -237,14 +236,11 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					throw new IMASTException("SharedTokenStore is null");
 				}
 				if (sharedToken == null) {
-					log
-							.info("sharedToken does not exist, will generate a new one and store in database.");
-
+					log.debug("sharedToken does not exist, will generate a new one and store in database.");
 					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
 					stStore.storeSharedToken(uid, sharedToken, primaryKeyName);
 				} else {
-					log
-							.info("sharedToken exists, will not generate a new one.");
+					log.debug("sharedToken exists, will not generate a new one.");
 				}
 			} else {
 				log
@@ -290,19 +286,15 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				IdPAttribute sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(STORED_ATTRIBUTE_NAME);
 				
 				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
-					log
-							.info("sharedToken does not exist, will generate a new one.");
+					log.debug("sharedToken does not exist, will generate a new one.");
 					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
 					if (getStoreLdap()) {
-						log
-								.debug("storeLdap=true, will store the SharedToken in LDAP.");
+						log.debug("storeLdap=true, will store the SharedToken in LDAP.");
 						storeSharedTokenInLdap(resolutionContext, resolverWorkContext, sharedToken);
 					} else
-						log
-								.info("storeLdap=false, not to store sharedToken in Ldap");
+						log.debug("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
-					log
-							.info("sharedToken  exists, will not to generate a new one.");
+					log.debug("sharedToken  exists, will not to generate a new one.");
 					sharedToken = sharedTokenFromLDAP.getValues().get(0).getValue().toString();
 				}
 			}
@@ -353,7 +345,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext, String sharedToken)
 			throws IMASTException {
 
-		log.info("calling storeSharedToken() ...");
+		log.debug("storing sharedToken value {} in LDAP connector {}", sharedToken, getLdapConnectorId());
 
 		try {		
 			// store the sharedToken value in LDAP, using the configured data connector
@@ -438,7 +430,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, String localId,
 			byte[] salt) throws ResolutionException {
 		String persistentId;
-		log.info("creating a sharedToken ...");
+		log.debug("creating a sharedToken ...");
 		try {
 			String localEntityId = null;
 			if (this.idpIdentifier == null) {
@@ -447,13 +439,14 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				localEntityId = idpIdentifier;
 			}
 			String globalUniqueID = localId + localEntityId + new String(salt);
-			log.info("the globalUniqueID (user/idp/salt): " + localId + " / "
+			log.debug("the globalUniqueID (user/idp/salt): " + localId + " / "
 					+ localEntityId + " / " + new String(salt));
 			byte[] hashValue = DigestUtils.sha1(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
 			persistentId = this.replace(persistentId);
-			log.info("the created sharedToken: " + persistentId);
+			log.debug("the created sharedToken: " + persistentId);
+			log.info("Created a new shared token value {} for user {}", persistentId, localId);
 		} catch (Exception e) {
 			log.error("Failed to create the sharedToken", e);
 			throw new ResolutionException("Failed to create the sharedToken", e);
@@ -465,7 +458,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	private String replace(String persistentId) {
 		// begin = convert non-alphanum chars in base64 to alphanum
 		// (/+=)
-		log.info("calling replace() ...");
+		log.debug("converting Base64 shared token to Url-safe Base64");
 		if (persistentId.contains("/") || persistentId.contains("+")
 				|| persistentId.contains("=")) {
 			String aepst;
@@ -502,7 +495,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	private String getLocalId(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
 			throws ResolutionException {
 
-		log.info("gets local ID ...");
+		log.debug("gets local ID ...");
 
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 		// get list of already resolved attributes (from dependencies)
@@ -517,24 +510,20 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
 
 			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
-				log
-						.error(
-								"Source attribute {} for connector {} provide no values",
-								ids[i], getId());
+				log.error("Source attribute {} for connector {} provide no values",
+						ids[i], getId());
 				throw new ResolutionException("Source attribute "
 						+ ids[i] + " for connector " + getId()
 						+ " provided no values");
 			}
 
 			if (sourceIdValues.size() > 1) {
-				log
-						.warn(
-								"Source attribute {} for connector {} has more than one value, only the first value is used",
-								ids[i], getId());
+				log.warn("Source attribute {} for connector {} has more than one value, only the first value is used",
+						ids[i], getId());
 			}
 			localIdValue.append(sourceIdValues.iterator().next().getValue().toString());
 		}
-		log.info("local ID: " + localIdValue.toString());
+		log.debug("local ID: " + localIdValue.toString());
 
 		return localIdValue.toString();
 	}
