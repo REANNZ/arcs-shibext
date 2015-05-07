@@ -24,6 +24,7 @@
             <excludes>
                 <exclude>**/target/**</exclude>
                 <exclude>**/bin/**</exclude>
+                <exclude>**/download/**</exclude>
             </excludes>
         </fileSet>
 
