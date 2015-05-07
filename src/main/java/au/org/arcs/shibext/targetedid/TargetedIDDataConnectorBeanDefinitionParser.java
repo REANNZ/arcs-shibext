@@ -26,18 +26,15 @@ public class TargetedIDDataConnectorBeanDefinitionParser extends
 
 	/** {@inheritDoc} */
 	@Override
-	protected Class<TargetedIDDataConnector> getBeanClass(Element element) {
+	protected Class<TargetedIDDataConnector> getNativeBeanClass() {
 		return TargetedIDDataConnector.class;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void doParse(Element pluginConfig,
+	protected void doV2Parse(Element pluginConfig,
 			ParserContext parserContext,
 			BeanDefinitionBuilder pluginBuilder) {
-
-		super.doParse(pluginConfig, parserContext,
-				pluginBuilder);
 
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
 			pluginBuilder.addPropertyValue("generatedAttributeId", pluginConfig
