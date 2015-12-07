@@ -31,11 +31,11 @@
         <!-- Documentation -->
         <fileSet>
             <directory>doc/</directory>
-            <outputDirectory>/doc</outputDirectory>
+            <outputDirectory>doc</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/site/apidocs</directory>
-            <outputDirectory>/doc/api</outputDirectory>
+            <outputDirectory>doc/api</outputDirectory>
         </fileSet>
     </fileSets>
     
