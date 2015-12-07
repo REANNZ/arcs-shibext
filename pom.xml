@@ -8,7 +8,7 @@
     <version>1.7.0</version>
     <packaging>jar</packaging>
 
-    <name>Shibboleth2 ARCS Extension</name>
+    <name>auEduPersonSharedToken Shibboleth IdPv3 Extension</name>
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
