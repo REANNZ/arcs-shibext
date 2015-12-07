@@ -9,7 +9,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
+import net.shibboleth.idp.attribute.resolver.spring.dc.impl.AbstractDataConnectorParser;
 import net.shibboleth.utilities.java.support.xml.AttributeSupport;
 import net.shibboleth.utilities.java.support.xml.ElementSupport;
 

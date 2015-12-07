@@ -5,7 +5,7 @@ package au.org.arcs.shibext.targetedid;
 
 import javax.xml.namespace.QName;
 
-import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
+import net.shibboleth.idp.attribute.resolver.spring.dc.impl.AbstractDataConnectorParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
