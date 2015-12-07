@@ -10,7 +10,10 @@
 
     <name>Shibboleth2 ARCS Extension</name>
 
-    
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <repository>
             <id>shib-release</id>
