@@ -121,7 +121,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			List<Element> le = ElementSupport.getChildElements(pluginConfig,
 					new QName(ARCSDataConnectorNamespaceHandler.NAMESPACE,
 							"DatabaseConnection"));
-			if (le != null) {
+			if (le != null && ! le.isEmpty()) {
 				ds = buildDatabaseConnection(
 						pluginConfig,
 						pluginBuilder,
