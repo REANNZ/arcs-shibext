@@ -156,7 +156,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (storeDatabase) {
 			if (stStore == null) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
-						+ " data connector requires a Database Connection when storedatabase=true");
+						+ " data connector requires a Database Connection when storeDatabase=true");
 			}
 		} else {
 		
@@ -178,7 +178,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			}
 		}
 		
-		// log a warning if both storeldap=false and storedatabase=false
+		// log a warning if both storeLdap=false and storeDatabase=false
 		if (!storeDatabase && !getStoreLdap()) {
 			log.warn("SharedTokenDataConnector {} is configured to store values neither in database nor in LDAP.  SharedToken values generated on the fly SHOULD NOT be used on production systems.", getId());
 		}
