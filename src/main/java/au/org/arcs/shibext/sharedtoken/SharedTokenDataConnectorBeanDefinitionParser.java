@@ -91,7 +91,9 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 		DataSource connectionSource = processConnectionManagement(pluginConfig, parserContext,
 				pluginBuilder);
-		pluginBuilder.addPropertyValue("dataSource", connectionSource);
+		if (connectionSource != null) {
+		    pluginBuilder.addPropertyValue("dataSource", connectionSource);
+		}
 
 	}
 
