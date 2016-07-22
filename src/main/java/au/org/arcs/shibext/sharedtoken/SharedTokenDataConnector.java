@@ -301,6 +301,13 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
 			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME, e);
+
+			// however, if we encountered an error (possibly in saving the attribute value),
+			// do not pass the value out - as the error would get masked and overlooked
+			if (sharedToken != null) {
+				log.error("Discarding sharedToken value {} due to errors encountered: {}", sharedToken, e.getMessage());
+				sharedToken = null;
+			}
 		}
 		if (sharedToken != null) {
 			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
