@@ -47,6 +47,9 @@ public class SharedTokenStore {
 				if (!isValid(conn)) {
 					conn.close();
 					conn = dataSource.getConnection();
+					//FIXME: this is not enough - the new connection
+					//is just taken from the pool and might be invalid as well
+					//Sort this at the DataSource layer instead!
 				}
 
 				st = conn
