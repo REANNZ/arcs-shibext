@@ -174,13 +174,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		}
 		try {
 			datasource.setDriverClass(driverClass);
-			// remove autoReconnect=true as it's reported not right for Oracle.
-			/*
-			datasource.setJdbcUrl(DatatypeHelper.safeTrim(dbc.getAttributeNS(
-					null, "jdbcURL")
-					+ "?autoReconnect=true"));
-			*/
-			
+
 			datasource.setJdbcUrl(MiscHelper.safeTrim(dbc.getAttributeNS(
 					null, "jdbcURL")));
 
@@ -188,6 +182,23 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 					"jdbcUserName")));
 			datasource.setPassword(MiscHelper.safeTrim(dbc.getAttributeNS(
 					null, "jdbcPassword")));
+
+			if (dbc.hasAttributeNS(null, "preferredTestQuery")) {
+				datasource.setPreferredTestQuery(MiscHelper.safeTrim(dbc.getAttributeNS(
+					null, "preferredTestQuery")));
+			};
+
+			if (dbc.hasAttributeNS(null, "testConnectionOnCheckin")) {
+				datasource.setTestConnectionOnCheckin(
+					AttributeSupport.getAttributeValueAsBoolean(dbc.getAttributeNodeNS(
+					null, "testConnectionOnCheckin")));
+			};
+
+			if (dbc.hasAttributeNS(null, "testConnectionOnCheckout")) {
+				datasource.setTestConnectionOnCheckout(
+					AttributeSupport.getAttributeValueAsBoolean(dbc.getAttributeNodeNS(
+					null, "testConnectionOnCheckout")));
+			};
 
 			log.debug("Created data source for data connector {}", pluginConfig.getAttribute("id"));
 			return datasource;

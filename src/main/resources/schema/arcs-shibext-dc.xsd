@@ -144,6 +144,27 @@
 				</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="preferredTestQuery" type="string">
+			<annotation>
+				<documentation>
+					The query to use to test database connections.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="testConnectionOnCheckin" type="boolean">
+			<annotation>
+				<documentation>
+					Whether to test database connection on check in.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="testConnectionOnCheckout" type="boolean">
+			<annotation>
+				<documentation>
+					Whether to test database connection on check out.
+				</documentation>
+			</annotation>
+		</attribute>
 		<attribute name="primaryKeyName" type="string">
 			<annotation>
 				<documentation>
