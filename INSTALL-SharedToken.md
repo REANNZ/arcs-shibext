@@ -40,13 +40,13 @@ Remove the old version if any and download jar into place
 ```
 cd $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib
 rm arcs-shibext-*.jar
-wget https://github.com/REANNZ/arcs-shibext/blob/master/download/arcs-shibext-1.5.5.jar
+wget https://github.com/REANNZ/arcs-shibext/raw/master/download/arcs-shibext-1.5.5.jar
 ```
 
 ```
 cd $IDP_SRC_HOME/lib
 rm arcs-shibext-*.jar
-wget https://github.com/REANNZ/arcs-shibext/blob/master/download/arcs-shibext-1.5.5.jar
+wget https://github.com/REANNZ/arcs-shibext/raw/master/download/arcs-shibext-1.5.5.jar
 ```
 Run IdP install script again. '''(make sure to answer NO to "DO you want to overwrite your configuration")'''
 ```
@@ -60,7 +60,7 @@ Apache Maven2 is needed to build the source. Find the Maven2 installation guide 
 Download the source package
 ```
 cd /tmp
-wget https://github.com/REANNZ/arcs-shibext/blob/master/download/arcs-shibext-1.5.5-src.tar.gz
+wget https://github.com/REANNZ/arcs-shibext/raw/master/download/arcs-shibext-1.5.5-src.tar.gz
 tar xzvf arcs-shibext-1.5.5-src.tar.gz
 cd arcs-shibext-1.5.5
 ```
