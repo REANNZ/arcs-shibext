@@ -10,14 +10,14 @@
 	elementFormDefault="qualified">
 
 	<import namespace="urn:mace:shibboleth:2.0:resolver"
-		schemaLocation="classpath:/schema/shibboleth-2.0-attribute-resolver.xsd" />
+		schemaLocation="http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd" />
 
 	<import namespace="urn:mace:shibboleth:2.0:security"
-		schemaLocation="classpath:/schema/shibboleth-2.0-security.xsd" />
+		schemaLocation="http://shibboleth.net/schema/idp/shibboleth-security.xsd" />
 
 
 	<import namespace="urn:mace:shibboleth:2.0:resolver:dc"
-		schemaLocation="classpath:/schema/shibboleth-2.0-attribute-resolver-dc.xsd" />
+		schemaLocation="http://shibboleth.net/schema/idp/shibboleth-attribute-resolver-dc.xsd" />
 
 	<complexType name="SharedToken">
 		<annotation>
