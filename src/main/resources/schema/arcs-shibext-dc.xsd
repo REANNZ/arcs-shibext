@@ -80,6 +80,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="storedAttributeName" type="string">
+					<annotation>
+						<documentation>
+							Name of the LDAP attribute to use to look up and store sharedToken in anLDAPDataConnector if storing values in LDAP.
+						</documentation>
+					</annotation>
+				</attribute>
 				<attribute name="idpIdentifier" type="string">
 					<annotation>
 						<documentation>

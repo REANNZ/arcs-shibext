@@ -54,8 +54,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	private final Logger log = LoggerFactory
 			.getLogger(SharedTokenDataConnector.class);
 
-	private static String STORED_ATTRIBUTE_NAME = "auEduPersonSharedToken";
-
 	/** Minimum salt length */
 	public static final int MINIMUM_SALT_LENGTH = 16;	
 	
@@ -83,6 +81,8 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	/** ID of the LDAPDataConnector to use if storing values in LDAP */
 	private String ldapConnectorId;
+
+	private String storedAttributeName = "auEduPersonSharedToken";
 	
 	/** Whether to store the sharedToken to database */
 	private boolean storeDatabase;
@@ -275,15 +275,15 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					}
 				}
 				
-				// We cannot rely on just getting STORED_ATTRIBUTE_NAME from
+				// We cannot rely on just getting storedAttributeName from
 				//   resolverWorkContext.getResolvedIdPAttributeDefinitions()
 				// - because there won't be an attribute definition of the same name to resolve from LDAP.
 				// (Such a definition would have an ID clashing with the attribute definition done using this connector.)
 				// Yes, we could import the attribute from LDAP explicitly under a different name
 				// And then pass that name to this connector as an additional parameter.
-				// But for now, let's get STORED_ATTRIBUTE_NAME as a ResolvedAttribute from the sharedTokenDC directly.
+				// But for now, let's get storedAttribteName as a ResolvedAttribute from the sharedTokenDC directly.
 				ResolvedDataConnector ldapDc = resolverWorkContext.getResolvedDataConnectors().get(getLdapConnectorId());
-				IdPAttribute sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(STORED_ATTRIBUTE_NAME);
+				IdPAttribute sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(storedAttributeName);
 				
 				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
 					log.debug("sharedToken does not exist, will generate a new one.");
@@ -300,7 +300,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			}
 		} catch (Exception e) {
 			// catch any exception so that the IdP will not screw up.
-			log.error("Failed to resolve " + STORED_ATTRIBUTE_NAME, e);
+			log.error("Failed to resolve sharedToken", e);
 
 			// however, if we encountered an error (possibly in saving the attribute value),
 			// do not pass the value out - as the error would get masked and overlooked
@@ -394,9 +394,9 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			// now construct a Modify operation
 			ModifyRequest mr = new ModifyRequest(targetDn, 
 					new AttributeModification(AttributeModificationType.ADD, 
-							new LdapAttribute(STORED_ATTRIBUTE_NAME, sharedToken)));
+							new LdapAttribute(storedAttributeName, sharedToken)));
 
-			log.info("adding {}:{} to {}:{}", STORED_ATTRIBUTE_NAME, sharedToken,
+			log.info("adding {}:{} to {}:{}", storedAttributeName, sharedToken,
 					getLdapConnectorId(), targetDn);			
 
 			// and get a connection and apply the modify operation
@@ -684,6 +684,21 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	 */
 	public void setLdapConnectorId(String ldapConnectorId) {
 		this.ldapConnectorId = ldapConnectorId;
+	}
+
+
+	/**
+	 * @return the storedAttributeName
+	 */
+	public String getStoredAttributeName() {
+		return storedAttributeName;
+	}
+
+	/**
+	 * @param storedAttributeName the storedAttributeName to set
+	 */
+	public void setStoredAttributeName(String storedAttributeName) {
+		this.storedAttributeName = storedAttributeName;
 	}
 
 }

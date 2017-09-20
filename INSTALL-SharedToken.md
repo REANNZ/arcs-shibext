@@ -113,6 +113,7 @@ cd $IDP_SRC_HOME
     * idpIdentifier: an identifier of the IdP, used for computing the sharedToken. optional, defaults to IdP entityID. Note: this attribute is not recommended to set unless you really need to.
     * storeLdap: a boolean value to indicate whether to persist the sharedToken in the depended Ldap. optional, defaults to true. '''Note: false means the sharedToken is generated on the fly which does not guarantee persistence and portability. Must not used in production environment.'''
     * ldapConnectorId: ID of the LDAPDataConnector to use if storing values in LDAP
+    * storedAttributeName: name of the LDAP attribute to use with the LDAP connector (for reading and writing).  Defaults to `"auEduPersonSharedToken"`
     * storeDatabase: a boolean value to indicate whether to persist the sharedToken in the database. optional, defaults to false. if set to true, storeLdap will be ignored. See the section [Database Support] [1].
     * idpHome: the path of IdP home directory. optional, defaults to the value configured in imast.properties.
     * salt: a string of random data; must be at least 16 characters. Be sure to write down this salt value somewhere safe so that the sharedToken are not lost if you delete your configuration file! Here is an example to get the salt with openssl:
