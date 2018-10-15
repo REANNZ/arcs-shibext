@@ -46,6 +46,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 
 /**
  * @author Damien Chen
+ * @author Vlad Mencl
  * 
  */
 public class SharedTokenDataConnector extends AbstractDataConnector {

@@ -28,6 +28,7 @@ import au.org.arcs.shibext.sharedtoken.MiscHelper;
 
 /**
  * @author Damien Chen
+ * @author Vlad Mencl
  * 
  */
 public class TargetedIDDataConnector extends AbstractDataConnector {

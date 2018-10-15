@@ -26,6 +26,7 @@ import au.org.arcs.shibext.handler.ARCSDataConnectorNamespaceHandler;
 
 /**
  * @author Damien Chen
+ * @author Vlad Mencl
  * 
  */
 public class SharedTokenDataConnectorBeanDefinitionParser extends
