@@ -121,10 +121,15 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			// NOTE: the DatabaseConnection element is intentionally 
 			// in the ARCS namespace as it has a slightly different 
 			// syntax then what's defined within urn:mace:shibboleth:2.0:resolver:dc
-			// NOTE: only first element is parsed.
 			List<Element> le = ElementSupport.getChildElements(pluginConfig,
 					new QName(ARCSDataConnectorNamespaceHandler.NAMESPACE,
 							"DatabaseConnection"));
+			// Only allow one DatabaseConnection element
+			if (le != null && le.size() >1) {
+				log.error("Only one DatabaseConnection element is allowed in a SharedTokenDataConnector definition");
+				throw new BeanCreationException("Only one DatabaseConnection element is allowed in a SharedTokenDataConnector definition");
+			}
+
 			if (le != null && ! le.isEmpty()) {
 				ds = buildDatabaseConnection(
 						pluginConfig,
