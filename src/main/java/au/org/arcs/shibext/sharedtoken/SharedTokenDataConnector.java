@@ -109,8 +109,16 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	 *            the computed ID
 	 * @param idSalt
 	 *            salt used when computing the ID
+	 * @param idpIdentifier
+	 *            the IdP identifier to use.  If not set, defaults to resolutionContext.getAttributeIssuerID() at runtime.
 	 * @param storeLdap
-	 *            Whether to store the sharedToken to Ldap
+	 *            Whether to store the sharedToken values into Ldap
+	 * @param storeDatabase
+	 *            Whether to store the sharedToken values into a database
+	 * @param source
+	 *            dataSource to use for retrieving and storing sharedToken values
+	 * @param primaryKeyName
+	 *            primary key name to use in the database.
 	 */
 	public SharedTokenDataConnector(String generatedAttributeId,
 			String sourceAttributeId, byte[] idSalt, 

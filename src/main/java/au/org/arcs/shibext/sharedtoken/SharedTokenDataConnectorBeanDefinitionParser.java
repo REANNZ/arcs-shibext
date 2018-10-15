@@ -105,10 +105,8 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	/**
 	 * Processes the connection management configuration.
 	 * 
-	 * @param pluginId
-	 *            ID of this data connector
-	 * @param pluginConfigChildren
-	 *            configuration elements for this connector
+	 * @param pluginConfig
+	 *            configuration element for this connector
 	 * @param pluginBuilder
 	 *            bean definition builder
 	 * 
@@ -149,8 +147,10 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	 * Builds a JDBC {@link DataSource} from an DatabaseConnection configuration
 	 * element.
 	 * 
-	 * @param pluginId
-	 *            ID of this data connector
+	 * @param pluginConfig
+	 *            configuration element for this connector
+	 * @param pluginBuilder
+	 *            bean definition builder
 	 * @param dbc
 	 *            the DatabaseConnection configuration element
 	 * 

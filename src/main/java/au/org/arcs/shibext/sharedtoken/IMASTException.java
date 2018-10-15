@@ -22,7 +22,7 @@ public class IMASTException extends Exception {
 	}
 
 	/**
-	 * @param message
+	 * @param message describing the exception
 	 */
 	public IMASTException(String message) {
 		super(message);
@@ -30,7 +30,7 @@ public class IMASTException extends Exception {
 	}
 
 	/**
-	 * @param cause
+	 * @param cause the exception that caused this exception
 	 */
 	public IMASTException(Throwable cause) {
 		super(cause);
@@ -38,8 +38,8 @@ public class IMASTException extends Exception {
 	}
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @param message message describing the exception
+	 * @param cause the exception that caused this exception
 	 */
 	public IMASTException(String message, Throwable cause) {
 		super(message, cause);
