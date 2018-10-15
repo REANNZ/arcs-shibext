@@ -31,25 +31,25 @@
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-api</artifactId>
-            <version>3.2.1</version>
+            <version>3.4.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-api</artifactId>
-            <version>3.2.1</version>
+            <version>3.4.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-impl</artifactId>
-            <version>3.2.1</version>
+            <version>3.4.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-spring</artifactId>
-            <version>3.2.1</version>
+            <version>3.4.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
