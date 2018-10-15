@@ -95,8 +95,7 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeDatabase", false);
 		}
 
-		DataSource connectionSource = processConnectionManagement(pluginConfig, parserContext,
-				pluginBuilder);
+		DataSource connectionSource = processConnectionManagement(pluginConfig, pluginBuilder);
 		if (connectionSource != null) {
 		    pluginBuilder.addPropertyValue("dataSource", connectionSource);
 		}
@@ -116,7 +115,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	 * @return data source built from configuration
 	 */
 	protected DataSource processConnectionManagement(Element pluginConfig,
-			ParserContext parserContext,
 			BeanDefinitionBuilder pluginBuilder) {
 
 		DataSource ds = null;
