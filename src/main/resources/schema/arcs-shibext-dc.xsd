@@ -28,10 +28,12 @@
 			</documentation>
 		</annotation>
 		<complexContent>
-			<extension base="resolver:BaseDataConnectorType">
-				<sequence>
-					<element ref="arcs:DatabaseConnection"
-						minOccurs="0">
+			<extension base="resolver:FlattenedBaseDataConnectorType">
+				<choice maxOccurs="unbounded" minOccurs="0">
+					<element ref="resolver:Dependency"/>
+					<element ref="resolver:InputAttributeDefinition"/>
+					<element ref="resolver:InputDataConnector"/>
+					<element ref="arcs:DatabaseConnection">
 						<annotation>
 							<documentation>
 								A connection to the database managed by
@@ -39,7 +41,7 @@
 							</documentation>
 						</annotation>
 					</element>
-				</sequence>
+				</choice>
 				<attribute name="generatedAttributeID" type="string">
 					<annotation>
 						<documentation>
