@@ -98,12 +98,12 @@ cd $IDP_SRC_HOME
 ```
     <!-- ==================== auEduPersonSharedToken data connector ================== -->
 
-    <resolver:DataConnector xsi:type="SharedToken" xmlns="urn:mace:arcs.org.au:shibboleth:2.0:resolver:dc"
+    <DataConnector xsi:type="st:SharedToken" xmlns:st="urn:mace:arcs.org.au:shibboleth:2.0:resolver:dc"
                         id="sharedToken"
                         sourceAttributeID="uid"
                         salt="ThisIsRandomText">
-        <resolver:Dependency ref="myLDAP" />
-    </resolver:DataConnector>
+        <Dependency ref="myLDAP" />
+    </DataConnector>
 ```
 
    * Attributes
@@ -130,17 +130,11 @@ openssl rand -base64 36 2>/dev/null
 ```
     <!-- ==================== auEduPersonSharedToken attribute definition ================== -->
 
-    <resolver:AttributeDefinition id="auEduPersonSharedToken" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad"
-        sourceAttributeID="auEduPersonSharedToken">
-
-        <resolver:Dependency ref="sharedToken" />
-
-        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder"
-            name="urn:mace:federation.org.au:attribute:auEduPersonSharedToken" />
-
-        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder"
-            name="urn:oid:1.3.6.1.4.1.27856.1.2.5" friendlyName="auEduPersonSharedToken" />
-    </resolver:AttributeDefinition>
+    <AttributeDefinition id="auEduPersonSharedToken" xsi:type="Simple" sourceAttributeID="auEduPersonSharedToken">
+        <Dependency ref="sharedToken" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:federation.org.au:attribute:auEduPersonSharedToken" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.27856.1.2.5" friendlyName="auEduPersonSharedToken" />
+    </AttributeDefinition>
 ```
 
  * Attributes
@@ -226,21 +220,23 @@ Edit $IDP_HOME/conf/attribute-resolve.xml, set the attribute '''storeDatabase="t
 ```
     <!-- ==================== auEduPersonSharedToken data connector ================== -->
 
-    <resolver:DataConnector xsi:type="SharedToken" xmlns="urn:mace:arcs.org.au:shibboleth:2.0:resolver:dc"
+    <DataConnector xsi:type="st:SharedToken" xmlns:st="urn:mace:arcs.org.au:shibboleth:2.0:resolver:dc"
                         id="sharedToken"
                         sourceAttributeID="uid"
                         salt="ThisIsRandomText"
                         storeDatabase="true"
                         >
-        <resolver:Dependency ref="myLDAP" />
+        <Dependency ref="myLDAP" />
         
-        <DatabaseConnection jdbcDriver="com.mysql.jdbc.Driver"
+        <st:DatabaseConnection jdbcDriver="com.mysql.jdbc.Driver"
                             jdbcURL="jdbc:mysql://localhost/idp_db?autoReconnect=true"
                             jdbcUserName="username"
                             jdbcPassword="password"
+                            preferredTestQuery="/* ping */ SELECT 1;"
+                            testConnectionOnCheckout="true"
                             primaryKeyName="uid"/>
         
-    </resolver:DataConnector>
+    </DataConnector>
 ```
 
 Note: primaryKeyName is the primary key name in the table. It is optional, defaults to "uid".
