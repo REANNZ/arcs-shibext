@@ -102,7 +102,7 @@ cd $IDP_SRC_HOME
                         id="sharedToken"
                         sourceAttributeID="uid"
                         salt="ThisIsRandomText">
-        <Dependency ref="myLDAP" />
+        <InputDataConnector ref="myLDAP" attributeNames="uid"/>
     </DataConnector>
 ```
 
@@ -130,8 +130,8 @@ openssl rand -base64 36 2>/dev/null
 ```
     <!-- ==================== auEduPersonSharedToken attribute definition ================== -->
 
-    <AttributeDefinition id="auEduPersonSharedToken" xsi:type="Simple" sourceAttributeID="auEduPersonSharedToken">
-        <Dependency ref="sharedToken" />
+    <AttributeDefinition id="auEduPersonSharedToken" xsi:type="Simple">
+        <InputDataConnector ref="sharedToken" attributeNames="auEduPersonSharedToken"/>
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:federation.org.au:attribute:auEduPersonSharedToken" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.27856.1.2.5" friendlyName="auEduPersonSharedToken" />
     </AttributeDefinition>
@@ -226,7 +226,7 @@ Edit $IDP_HOME/conf/attribute-resolve.xml, set the attribute '''storeDatabase="t
                         salt="ThisIsRandomText"
                         storeDatabase="true"
                         >
-        <Dependency ref="myLDAP" />
+        <InputDataConnector ref="myLDAP" attributeNames="uid"/>
         
         <st:DatabaseConnection jdbcDriver="com.mysql.jdbc.Driver"
                             jdbcURL="jdbc:mysql://localhost/idp_db?autoReconnect=true"
