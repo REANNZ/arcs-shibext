@@ -263,7 +263,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						String key = itAttr.next();
 						log.trace("resolverWorkContext.getResolvedIdPAttributeDefinitions() contains {}", key);
 						IdPAttribute debugIdPAttr = debugAttrs.get(key).getResolvedAttribute();
-						for (Iterator<IdPAttributeValue<?>> itValue = debugIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
+						for (Iterator<IdPAttributeValue> itValue = debugIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
 							log.trace("attribute {} contains value {}", key, itValue.next().getValue().toString());						
 						}
 					}
@@ -278,7 +278,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 							String key = itAttr.next();
 							log.trace("resolved DC {} contains attribute {}", dcId, key);
 							IdPAttribute dcIdPAttr = dcAttrs.get(key);
-							for (Iterator<IdPAttributeValue<?>> itValue = dcIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
+							for (Iterator<IdPAttributeValue> itValue = dcIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
 								log.trace("resolved DC {} attribute {} contains value {}", dcId, key, itValue.next().getValue().toString());						
 							}
 						}
@@ -321,7 +321,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		}
 		if (sharedToken != null) {
 			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
-			Collection<IdPAttributeValue<String>> values = new ArrayList<IdPAttributeValue<String>>();
+			Collection<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
 			values.add(new StringAttributeValue(sharedToken));
 			attribute.setValues(values);
 			attributes.put(attribute.getId(), attribute);			
@@ -380,7 +380,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			// We need to construct a map of resolved attribute values in order to construct a search filter.  
 					
 			// uh, can we get this structure easier or do we need to build it?
-			Map<String, List<IdPAttributeValue<?>>> resolvedAttributeValues = new TreeMap<String,List<IdPAttributeValue<?>>>();
+			Map<String, List<IdPAttributeValue>> resolvedAttributeValues = new TreeMap<String,List<IdPAttributeValue>>();
 			Map<String, IdPAttribute> resolvedAttributes = resolutionContext.getResolvedIdPAttributes(); 
 			for (Iterator<String> itAttr = resolvedAttributes.keySet().iterator(); itAttr.hasNext(); ) {
 				String attrKey = itAttr.next();						
@@ -545,7 +545,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 		StringBuffer localIdValue = new StringBuffer();
 		for (int i = 0; i < ids.length; i++) {
-			Collection<IdPAttributeValue<?>> sourceIdValues = null;
+			Collection<IdPAttributeValue> sourceIdValues = null;
 			
 			if (resolvedAttributesMap.get(ids[i]) != null ) 
 				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();

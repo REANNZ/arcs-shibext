@@ -117,7 +117,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 		try {
 			String targetedID = getTargetedID(resolutionContext, resolverWorkContext);
 			IdPAttribute attribute = new IdPAttribute(getGeneratedAttributeId());
-			Collection<IdPAttributeValue<String>> values = new ArrayList<IdPAttributeValue<String>>();
+			Collection<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
 			values.add(new StringAttributeValue(targetedID));
 			attribute.setValues(values);			
 			attributes.put(attribute.getId(), attribute);
@@ -174,7 +174,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 		
 		for (int i = 0; i < ids.length; i++) {
 
-			Collection<IdPAttributeValue<?>> sourceIdValues = null;
+			Collection<IdPAttributeValue> sourceIdValues = null;
 			
 			if (resolvedAttributesMap.get(ids[i]) != null ) 
 				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
