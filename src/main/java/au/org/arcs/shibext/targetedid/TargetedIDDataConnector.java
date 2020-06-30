@@ -317,7 +317,7 @@ public class TargetedIDDataConnector extends AbstractDataConnector {
 
 	/** {@inheritDoc} */
 	public void validate() throws ResolutionException {
-		if (getDependencies().size() != 1) {
+		if ( (getAttributeDependencies().size() + getDataConnectorDependencies().size()) != 1) {
 			log.error("targetedID " + getId()
 					+ " data connectore requires exactly one dependency");
 			throw new ResolutionException("Computed ID " + getId()

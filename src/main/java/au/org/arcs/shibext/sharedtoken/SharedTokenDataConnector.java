@@ -40,7 +40,8 @@ import net.shibboleth.idp.attribute.resolver.ResolutionException;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
-import net.shibboleth.idp.attribute.resolver.ResolverPluginDependency;
+import net.shibboleth.idp.attribute.resolver.ResolverAttributeDefinitionDependency;
+import net.shibboleth.idp.attribute.resolver.ResolverDataConnectorDependency;
 import net.shibboleth.utilities.java.support.collection.LazyMap;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
@@ -180,7 +181,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			// whenever we are using LDAP for reading or writing, we need to see the LDAP connector among dependencies
 
 			// check getLdapConnectorId() can be found in the getDependencies() Set
-			if (!dependenciesContainsId(getDependencies(), getLdapConnectorId())) {
+			if (!dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), getLdapConnectorId())) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
 						+ " is configured to use LDAP connector ID " + getLdapConnectorId()
 						+ " but the connector is not listed in dependencies");
@@ -200,7 +201,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		// log a warning if any of the attributes listed in getSourceAttributeId() cannot be found in the getDependencies() Set
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 		for (int i = 0; i < ids.length; i++) {
-			if (!dependenciesContainsId(getDependencies(), ids[i])) {
+			if (!dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ids[i])) {
 				log.warn("Source attribute ID {} not listed in dependencies of connector {}", ids[i], getId());
 			}			
 		}
@@ -568,11 +569,22 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		return localIdValue.toString();
 	}
 	
-	private boolean dependenciesContainsId(Set<ResolverPluginDependency> dependencies, String id) {
-		for (Iterator<ResolverPluginDependency> it=dependencies.iterator(); it.hasNext(); ) {
-			if (it.next().getDependencyPluginId().equals(id)) return true;
-		}
-		return false;
+	private boolean dependenciesContainsId(Set<ResolverAttributeDefinitionDependency> attrDependencies,
+                Set<ResolverDataConnectorDependency> dcDependencies, String id) {
+
+            for (Iterator<ResolverAttributeDefinitionDependency> it=attrDependencies.iterator(); it.hasNext(); ) {
+                    if (it.next().getDependencyPluginId().equals(id)) return true;
+            }
+            for (Iterator<ResolverDataConnectorDependency> it=dcDependencies.iterator(); it.hasNext(); ) {
+                    ResolverDataConnectorDependency dc = it.next();
+                    if (dc.getDependencyPluginId().equals(id)) return true;
+
+                    // accept also a name of an attribute on a DataConnector dependency
+                    for (Iterator<String> it2 = dc.getAttributeNames().iterator(); it2.hasNext(); ) {
+                        if (it2.next().equals(id)) return true;
+                    }
+            }
+            return false;
 	}
 
 	/**
