@@ -34,7 +34,7 @@ import net.shibboleth.idp.attribute.resolver.ResolvedAttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.ResolvedDataConnector;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolverWorkContext;
-import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.ExecutableSearchFilter;
+import net.shibboleth.idp.attribute.resolver.dc.ldap.ExecutableSearchFilter;
 import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.LDAPDataConnector;
 import net.shibboleth.idp.attribute.resolver.ResolutionException;
 import net.shibboleth.idp.attribute.IdPAttribute;
