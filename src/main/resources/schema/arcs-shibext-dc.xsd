@@ -28,9 +28,8 @@
 			</documentation>
 		</annotation>
 		<complexContent>
-			<extension base="resolver:FlattenedBaseDataConnectorType">
+			<extension base="resolver:BaseDataConnectorType">
 				<choice maxOccurs="unbounded" minOccurs="0">
-					<element ref="resolver:Dependency"/>
 					<element ref="resolver:InputAttributeDefinition"/>
 					<element ref="resolver:InputDataConnector"/>
 					<element ref="arcs:DatabaseConnection">
