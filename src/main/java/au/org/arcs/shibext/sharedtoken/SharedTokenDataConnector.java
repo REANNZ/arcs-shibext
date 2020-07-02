@@ -264,7 +264,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						log.trace("resolverWorkContext.getResolvedIdPAttributeDefinitions() contains {}", key);
 						IdPAttribute debugIdPAttr = debugAttrs.get(key).getResolvedAttribute();
 						for (Iterator<IdPAttributeValue> itValue = debugIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
-							log.trace("attribute {} contains value {}", key, itValue.next().getValue().toString());						
+							log.trace("attribute {} contains value {}", key, itValue.next().getDisplayValue().toString());
 						}
 					}
 					
@@ -279,7 +279,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 							log.trace("resolved DC {} contains attribute {}", dcId, key);
 							IdPAttribute dcIdPAttr = dcAttrs.get(key);
 							for (Iterator<IdPAttributeValue> itValue = dcIdPAttr.getValues().iterator(); itValue.hasNext(); ) {
-								log.trace("resolved DC {} attribute {} contains value {}", dcId, key, itValue.next().getValue().toString());						
+								log.trace("resolved DC {} attribute {} contains value {}", dcId, key, itValue.next().getDisplayValue().toString());
 							}
 						}
 					}
@@ -305,7 +305,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						log.debug("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
 					log.debug("sharedToken  exists, will not to generate a new one.");
-					sharedToken = sharedTokenFromLDAP.getValues().get(0).getValue().toString();
+					sharedToken = sharedTokenFromLDAP.getValues().get(0).getNativeValue().toString();
 				}
 			}
 		} catch (Exception e) {
@@ -562,7 +562,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				log.warn("Source attribute {} for connector {} has more than one value, only the first value is used",
 						ids[i], getId());
 			}
-			localIdValue.append(sourceIdValues.iterator().next().getValue().toString());
+			localIdValue.append(sourceIdValues.iterator().next().getNativeValue().toString());
 		}
 		log.debug("local ID: " + printableLocalId(localIdValue.toString()));
 
