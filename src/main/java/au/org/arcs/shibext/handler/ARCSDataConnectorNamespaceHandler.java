@@ -5,7 +5,6 @@ package au.org.arcs.shibext.handler;
 
 import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
 import au.org.arcs.shibext.sharedtoken.SharedTokenDataConnectorBeanDefinitionParser;
-import au.org.arcs.shibext.targetedid.TargetedIDDataConnectorBeanDefinitionParser;
 
 /**
  * @author Damien Chen
@@ -21,10 +20,6 @@ public class ARCSDataConnectorNamespaceHandler extends
 	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
 	 */
 	public void init() {
-		registerBeanDefinitionParser(
-				TargetedIDDataConnectorBeanDefinitionParser.TYPE_NAME,
-				new TargetedIDDataConnectorBeanDefinitionParser());
-
 		registerBeanDefinitionParser(
 				SharedTokenDataConnectorBeanDefinitionParser.TYPE_NAME,
 				new SharedTokenDataConnectorBeanDefinitionParser());

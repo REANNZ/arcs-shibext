@@ -16,7 +16,7 @@ This document describes how to enable auEduPersonSharedToken on Shibboleth IdP 2
 ## Introduction
  * '''auEduPersonSharedToken:''' aEPST is a unique identifier enabling federation spanning services such as Grid and Repositories. The value of the identifier is unique, non-reassigned, persistent and portable.
  * '''IMAST:''' IMAST is one approach for IdPs in the AAF to provide the aEPST for their user. The aEPST is generated and managed by home IdP rather than the Federated aEPST service.
- * '''ARCS Shibboleth Extension:''' This is a java library extending Shibboleth2 data connectors. It provides the implementations of IMAST auEduPersonSharedToken and eduPersonTargetedID. The SharedToken is generated when it does not exist, then persisted in the institutional LDAP or the database. The eduPersonTargetedID is created on the fly.
+ * '''ARCS Shibboleth Extension:''' This is a java library extending Shibboleth2 data connectors. It provides the implementations of IMAST auEduPersonSharedToken. The SharedToken is generated when it does not exist, then persisted in the institutional LDAP or the database.
 
 '''IMPORTANT:''' The generation of the SharedToken relies on the user's identifier, the IdP's Identifier and the private seed. Change of the inputs will change the SharedToken value. This is likely to happen due to the change of the user's identifier, the home institution, the upgrade of the IdP and so on. Therefore, in production environment, the SharedToken must be only generated once and persisted in the institution LDAP or the database for future uses. The administrator should also ensure all selected inputs available and stable for user's Ldap entries.
 
