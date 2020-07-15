@@ -233,13 +233,9 @@ Edit $IDP_HOME/conf/attribute-resolve.xml, set the attributes '''storeDatabase="
 It's been tested under MySQL, but should also works with other types of database system. Sample Database Scripts:
 
 ```
-mysql> create user 'idp_admin'@'localhost' identified by 'idp_admin';
-
-mysql> grant all privileges on *.* to 'idp_admin'@'localhost' with grant option;
-
-$mysql -u idp_admin -p
-
+CREATE USER 'idp_admin'@'localhost' IDENTIFIED BY 'idp_admin';
 CREATE DATABASE idp_db;
+GRANT SELECT,INSERT ON idp_db.tb_st to 'idp_admin'@'localhost';
 
 CREATE TABLE tb_st (
 uid VARCHAR(100) NOT NULL,
