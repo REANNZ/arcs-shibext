@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 import javax.sql.DataSource;
 
@@ -88,21 +89,21 @@ public class SharedTokenStore {
 		log.info("SharedTokenStore: storing value {} for uid {}", sharedToken, uid);
 		Connection conn = null;
 		// PreparedStatement st = null;
-		Statement st = null;
+		PreparedStatement st = null;
 
 		try {
 
 			try {
 				conn = dataSource.getConnection();
-				st = conn.createStatement();
-				st.execute("INSERT INTO tb_st VALUES ('" + uid + "','"
-						+ sharedToken + "')");
-				log.debug("INSERT INTO tb_st VALUES ('" + uid + "','"
-						+ sharedToken + "')");
-				log.debug("Successfully store the SharedToken in the database");
+				st = conn.prepareStatement("INSERT INTO tb_st VALUES (?, ?)");
+				st.setString(1, uid);
+				st.setString(2, sharedToken);
+				st.executeUpdate();
+				log.debug("INSERT INTO tb_st VALUES ('{}', '{}')", uid, sharedToken);
+				log.debug("Successfully stored the SharedToken value into database");
 			} catch (SQLException e) {
 				log.error("Failed to store SharedToken into database", e);
-				throw new IMASTException("Failed to store SharedToken into database", e);
+				throw new IMASTException("Failed to store the SharedToken value into database", e);
 			} finally {
 				try {
 					conn.close();
