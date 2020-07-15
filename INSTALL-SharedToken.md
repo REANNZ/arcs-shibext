@@ -204,19 +204,15 @@ grep au.org.arcs $IDP_HOME/logs/idp-process.log
 
 ## Database Support
 
-From version 1.5.0, we added database support to IMAST. Users, who do not have write permission to their institutional LDAP, now are able to store the SharedToken to relational database.
+From this mdoule supports storing sharedToken values in a relational database.  This should be primarily used where it's not feasible to store the values directly into the institutional LDAP.
 
- * Install latest version, see above section.
- * Install JDBC Connector
-  * Download your JDBC Connector to $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib
-  * Run IdP install script again. '''(make sure to answer NO to "DO you want to overwrite your configuration")'''
-```
-cd $IDP_SRC_HOME
-./install.sh
-```
+We assume the IdP is already configured with a DataSource bean - please see [IDP30 Storage Configuration] [2].
+
+To avoid duplication, instead of providing a means for defining a DataSource, this module will reuse a DataSource defined in the main IdP configuration.  Please pass the reference to the DataSource bean in the `databaseConnectionID` attribute.
+
  * Configuration Sample
 
-Edit $IDP_HOME/conf/attribute-resolve.xml, set the attribute '''storeDatabase="true"''' and '''DatabaseConnection''' element. It may look like this: 
+Edit $IDP_HOME/conf/attribute-resolve.xml, set the attributes '''storeDatabase="true"''' '''databaseConnectionID="<ID of dataSource bean>"''. It may look like this:
 
 ```
     <!-- ==================== auEduPersonSharedToken data connector ================== -->
@@ -226,15 +222,9 @@ Edit $IDP_HOME/conf/attribute-resolve.xml, set the attribute '''storeDatabase="t
                         sourceAttributeID="uid"
                         salt="ThisIsRandomText"
                         storeDatabase="true"
+                        databaseConnectionID="shibboleth.JPAStorageService.DataSource"
                         >
         <InputDataConnector ref="myLDAP" attributeNames="uid"/>
-        
-        <st:DatabaseConnection jdbcDriver="com.mysql.jdbc.Driver"
-                            jdbcURL="jdbc:mysql://localhost/idp_db?autoReconnect=true"
-                            jdbcUserName="username"
-                            jdbcPassword="password"
-                            preferredTestQuery="/* ping */ SELECT 1;"
-                            testConnectionOnCheckout="true"/>
         
     </DataConnector>
 ```
@@ -258,3 +248,4 @@ PRIMARY KEY  (uid)
 );
 ```
 [1]: #database-support "Database Support"
+[2]: https://wiki.shibboleth.net/confluence/display/IDP30/StorageConfiguration "IDP30 StorageConfiguration"

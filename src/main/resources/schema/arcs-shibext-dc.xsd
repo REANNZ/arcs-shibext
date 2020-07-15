@@ -32,14 +32,6 @@
 				<choice maxOccurs="unbounded" minOccurs="0">
 					<element ref="resolver:InputAttributeDefinition"/>
 					<element ref="resolver:InputDataConnector"/>
-					<element ref="arcs:DatabaseConnection">
-						<annotation>
-							<documentation>
-								A connection to the database managed by
-								the data connector.
-							</documentation>
-						</annotation>
-					</element>
 				</choice>
 				<attribute name="generatedAttributeID" type="string">
 					<annotation>
@@ -113,73 +105,6 @@
 				</attribute>
 			</extension>
 		</complexContent>
-	</complexType>
-
-	<element name="DatabaseConnection"
-		type="arcs:DatabaseConnectionType">
-		<annotation>
-			<documentation>
-				Describes a database connection source that is managed
-				by the attribute resolver data connector.
-			</documentation>
-		</annotation>
-	</element>
-	<complexType name="DatabaseConnectionType">
-		<attribute name="jdbcDriver" type="string" use="required">
-			<annotation>
-				<documentation>
-					This is the full qualified class name of the JDBC
-					driver used to connect to the database.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="jdbcURL" type="string" use="required">
-			<annotation>
-				<documentation>
-					The JDBC URL for the database. These are usually of
-					the form
-					jdbc:databaseProduceName:databaseSpecificInformation.
-					For example, jdbc:hsql:mem:MyDatabase
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="jdbcUserName" type="string" use="required">
-			<annotation>
-				<documentation>
-					The user name to use while connecting to the
-					database.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="jdbcPassword" type="string" use="required">
-			<annotation>
-				<documentation>
-					The password to use while connecting to the
-					database.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="preferredTestQuery" type="string">
-			<annotation>
-				<documentation>
-					The query to use to test database connections.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="testConnectionOnCheckin" type="boolean">
-			<annotation>
-				<documentation>
-					Whether to test database connection on check in.
-				</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="testConnectionOnCheckout" type="boolean">
-			<annotation>
-				<documentation>
-					Whether to test database connection on check out.
-				</documentation>
-			</annotation>
-		</attribute>
 	</complexType>
 
 </schema>
