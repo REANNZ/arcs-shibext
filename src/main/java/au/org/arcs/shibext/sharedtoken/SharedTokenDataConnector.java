@@ -92,9 +92,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	/** SharedToken data store.  DataSource to use for retrieving and storing sharedToken values. */
 	private SharedTokenStore stStore;
 
-	/** Primary key in SharedToken database */
-	private String primaryKeyName;
-
 	/**
 	 * Constructor.  Takes no arguments, all parameters are to be supplied as properties.
          */
@@ -198,7 +195,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				String uid = resolutionContext.getPrincipal();
 
 				if (stStore != null) {
-					sharedToken = stStore.getSharedToken(uid, primaryKeyName);
+					sharedToken = stStore.getSharedToken(uid);
 				} else {
 					log.error("SharedTokenStore is null");
 					throw new IMASTException("SharedTokenStore is null");
@@ -206,7 +203,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				if (sharedToken == null) {
 					log.debug("sharedToken does not exist, will generate a new one and store in database.");
 					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
-					stStore.storeSharedToken(uid, sharedToken, primaryKeyName);
+					stStore.storeSharedToken(uid, sharedToken);
 				} else {
 					log.debug("sharedToken exists, will not generate a new one.");
 				}
@@ -617,14 +614,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	public void setStoreDatabase(boolean storeDatabase) {
 		this.storeDatabase = storeDatabase;
-	}
-
-	public String getPrimaryKeyName() {
-		return primaryKeyName;
-	}
-
-	public void setPrimaryKeyName(String primaryKeyName) {
-		this.primaryKeyName = primaryKeyName;
 	}
 
 	public void setSalt(byte[] salt) {

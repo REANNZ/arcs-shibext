@@ -233,13 +233,10 @@ Edit $IDP_HOME/conf/attribute-resolve.xml, set the attribute '''storeDatabase="t
                             jdbcUserName="username"
                             jdbcPassword="password"
                             preferredTestQuery="/* ping */ SELECT 1;"
-                            testConnectionOnCheckout="true"
-                            primaryKeyName="uid"/>
+                            testConnectionOnCheckout="true"/>
         
     </DataConnector>
 ```
-
-Note: primaryKeyName is the primary key name in the table. It is optional, defaults to "uid".
 
  * Set up the database. 
 It's been tested under MySQL, but should also works with other types of database system. Sample Database Scripts:
@@ -258,7 +255,5 @@ uid VARCHAR(100) NOT NULL,
 sharedToken VARCHAR(50),
 PRIMARY KEY  (uid)
 );
-
-Note: replace the "uid" with the primary key name if you have set it in above.
 ```
 [1]: #database-support "Database Support"

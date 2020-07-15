@@ -173,13 +173,6 @@
 				</documentation>
 			</annotation>
 		</attribute>
-		<attribute name="primaryKeyName" type="string">
-			<annotation>
-				<documentation>
-					The primary key name to index the SharedToken
-				</documentation>
-			</annotation>
-		</attribute>
 	</complexType>
 
 </schema>

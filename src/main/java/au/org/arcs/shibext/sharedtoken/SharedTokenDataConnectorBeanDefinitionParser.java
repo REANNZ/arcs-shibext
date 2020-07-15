@@ -163,13 +163,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 	 */
 	protected DataSource buildDatabaseConnection(Element pluginConfig, BeanDefinitionBuilder pluginBuilder, Element dbc) {
 
-		if (dbc.hasAttributeNS(null, "primaryKeyName")) {
-			pluginBuilder.addPropertyValue("primaryKeyName", dbc
-					.getAttributeNS(null, "primaryKeyName"));
-		} else {
-			pluginBuilder.addPropertyValue("primaryKeyName", "uid");
-		}
-
 		ComboPooledDataSource datasource = new ComboPooledDataSource();
 		String driverClass = MiscHelper.safeTrim(dbc.getAttributeNS(null,
 				"jdbcDriver"));

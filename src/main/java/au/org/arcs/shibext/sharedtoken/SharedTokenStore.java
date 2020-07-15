@@ -32,7 +32,7 @@ public class SharedTokenStore {
 
 	}
 
-	public String getSharedToken(String uid, String primaryKeyName)
+	public String getSharedToken(String uid)
 			throws IMASTException {
 		log.debug("calling getSharedToken ...");
 
@@ -53,12 +53,9 @@ public class SharedTokenStore {
 					//Sort this at the DataSource layer instead!
 				}
 
-				st = conn
-						.prepareStatement("SELECT sharedToken from tb_st WHERE "
-								+ primaryKeyName + "=?");
+				st = conn.prepareStatement("SELECT sharedToken from tb_st WHERE uid=?");
 				st.setString(1, uid);
-				log.debug("SELECT sharedToken from tb_st WHERE "
-						+ primaryKeyName + "=" + uid);
+				log.debug("SELECT sharedToken from tb_st WHERE uid=" + uid);
 				rs = st.executeQuery();
 
 				while (rs.next()) {
@@ -84,8 +81,7 @@ public class SharedTokenStore {
 		return sharedToken;
 	}
 
-	public void storeSharedToken(String uid, String sharedToken,
-			String primaryKeyName) throws IMASTException {
+	public void storeSharedToken(String uid, String sharedToken) throws IMASTException {
 		log.info("SharedTokenStore: storing value {} for uid {}", sharedToken, uid);
 		Connection conn = null;
 		// PreparedStatement st = null;
