@@ -116,10 +116,10 @@ cd $IDP_SRC_HOME
 
             openssl rand -base64 36 2>/dev/null
     * Element
-      * dependencies:
+      * `InputAttributeDefinition`
         * the attribute specified by sourceAttributeID
+      * `InputDataConnector`:
         * the Ldap data connector where the sharedToken is written to.
-      * DatabaseConnection: the JDBC connection parameters. Optional, must be set when storeDatabase is set to true.  See the section [Database Support][1].
   * Define the attribute 
 
         <!-- ==================== auEduPersonSharedToken attribute definition ================== -->
@@ -129,9 +129,9 @@ cd $IDP_SRC_HOME
             <AttributeEncoder xsi:type="SAML1String" name="urn:mace:federation.org.au:attribute:auEduPersonSharedToken" />
             <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.27856.1.2.5" friendlyName="auEduPersonSharedToken" />
         </AttributeDefinition>
-    * Attributes
-      * sourceAttributesID: the ID of the attribute used for the sharedToken in the data connector. It must match the generatedAttributeID in the data connector.
-      * ref: the data connector id.
+    * `InputDataConnector`
+      * `sourceAttributesID`: the ID of the attribute used for the sharedToken in the data connector. It must match the `generatedAttributeID` in the data connector.
+      * `ref`: the sharedToken data connector id.
 * Configure $IDP_HOME/conf/attribute-filter.xml to release the auEduPersonSharedToken
 * Restart Tomcat server
 
