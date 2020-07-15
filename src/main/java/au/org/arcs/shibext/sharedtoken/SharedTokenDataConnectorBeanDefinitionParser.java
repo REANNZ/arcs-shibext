@@ -95,6 +95,10 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeDatabase", false);
 		}
 
+		if (pluginConfig.hasAttributeNS(null, "databaseConnectionID")) {
+			pluginBuilder.addPropertyReference("dataSource", pluginConfig
+					.getAttributeNS(null, "databaseConnectionID"));
+		}
 		DataSource connectionSource = processConnectionManagement(pluginConfig, pluginBuilder);
 		if (connectionSource != null) {
 		    pluginBuilder.addPropertyValue("dataSource", connectionSource);

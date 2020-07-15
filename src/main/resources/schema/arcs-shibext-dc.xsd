@@ -104,6 +104,13 @@
 						</documentation>
 					</annotation>
 				</attribute>
+				<attribute name="databaseConnectionID" type="string">
+					<annotation>
+						<documentation>
+							ID of a bean defining the database connection to use for sharedToken values.
+						</documentation>
+					</annotation>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
