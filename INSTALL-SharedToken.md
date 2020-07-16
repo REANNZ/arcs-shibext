@@ -38,7 +38,7 @@ We'll install the latest version in this instruction. You can find older version
 
 Remove the old version if any and download jar into place
 ```
-cd $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib
+cd $IDP_SRC_HOME/src/main/edit-webapp/WEB-INF/lib
 rm arcs-shibext-*.jar
 wget https://github.com/REANNZ/arcs-shibext/raw/master/download/arcs-shibext-1.5.5.jar
 ```
@@ -70,12 +70,12 @@ mvn package
 ```
 Remove the old version if any
 ```
-rm $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib/arcs-shibext-*.jar
+rm $IDP_SRC_HOME/src/main/edit-webapp/WEB-INF/lib/arcs-shibext-*.jar
 rm $IDP_SRC_HOME/lib/arcs-shibext-*.jar
 ```
 Copy the jar
 ```
-cp target/arcs-shibext-1.5.5.jar $IDP_SRC_HOME/src/main/webapp/WEB-INF/lib
+cp target/arcs-shibext-1.5.5.jar $IDP_SRC_HOME/src/main/edit-webapp/WEB-INF/lib
 cp target/arcs-shibext-1.5.5.jar $IDP_SRC_HOME/lib
 ```
 Run IdP install script again. '''(make sure to answer NO to "DO you want to overwrite your configuration")'''
