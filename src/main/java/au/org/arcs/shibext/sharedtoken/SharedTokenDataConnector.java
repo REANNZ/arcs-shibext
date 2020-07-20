@@ -81,7 +81,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	/** Whether to store the sharedToken values into Ldap */
 	private boolean storeLdap;
 
-	/** ID of the LDAPDataConnector to use if storing values in LDAP */
+	/** ID of the LDAPDataConnector to use to fetch values from (if provided), and to store values into (if storing values in LDAP) */
 	private String ldapConnectorId;
 
 	private String storedAttributeName = "auEduPersonSharedToken";
@@ -128,19 +128,15 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 						+ " data connector requires a Database Connection when storeDatabase=true");
 			}
 		} else {
-		
-			// check ldapConnectorId is set whenenver storeDatabase is false
-			// - because then we are already fetching from LDAP
-			// (and we now need the connector Id even for fetching)
-			if (ldapConnectorId == null) {
+			if (storeLdap && ldapConnectorId == null) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
-						+ " data connector requires an Ldap Connector ID when using sharedToken from LDAP");
+						+ " data connector requires an LDAP Connector ID when storing sharedToken values into LDAP");
 			}
 		
 			// whenever we are using LDAP for reading or writing, we need to see the LDAP connector among dependencies
 
-			// check ldapConnectorId can be found in the getDependencies() Set
-			if (!dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ldapConnectorId)) {
+			// if ldapConnectorId is provided, check it can be found in the provided dependencies
+			if (ldapConnectorId != null && !dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ldapConnectorId)) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
 						+ " is configured to use LDAP connector ID " + ldapConnectorId
 						+ " but the connector is not listed in dependencies");
@@ -240,10 +236,13 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				// (Such a definition would have an ID clashing with the attribute definition done using this connector.)
 				// Yes, we could import the attribute from LDAP explicitly under a different name
 				// And then pass that name to this connector as an additional parameter.
-				// But for now, let's get storedAttribteName as a ResolvedAttribute from the sharedTokenDC directly.
-				ResolvedDataConnector ldapDc = resolverWorkContext.getResolvedDataConnectors().get(ldapConnectorId);
-				IdPAttribute sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(storedAttributeName);
-				
+				// But for now, let's get storedAttributeName as a ResolvedAttribute from the sharedTokenDC directly.
+				IdPAttribute sharedTokenFromLDAP = null;
+				if (ldapConnectorId != null) {
+					ResolvedDataConnector ldapDc = resolverWorkContext.getResolvedDataConnectors().get(ldapConnectorId);
+					sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(storedAttributeName);
+				}
+
 				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
 					log.debug("sharedToken does not exist, will generate a new one.");
 					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
@@ -253,7 +252,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 					} else
 						log.debug("storeLdap=false, not to store sharedToken in Ldap");
 				} else {
-					log.debug("sharedToken  exists, will not to generate a new one.");
+					log.debug("sharedToken exists, will not to generate a new one.");
 					sharedToken = sharedTokenFromLDAP.getValues().get(0).getNativeValue().toString();
 				}
 			}
