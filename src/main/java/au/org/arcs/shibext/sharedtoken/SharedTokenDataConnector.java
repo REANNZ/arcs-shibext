@@ -152,7 +152,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		String[] ids = sourceAttributeId.split(SEPARATOR);
 		for (int i = 0; i < ids.length; i++) {
 			if (!dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ids[i])) {
-				log.warn("Source attribute ID {} not listed in dependencies of connector {}", ids[i], getId());
+				throw new ComponentInitializationException("Source attribute ID " + ids[i] + " not listed in dependencies of connector " + getId());
 			}			
 		}
 
