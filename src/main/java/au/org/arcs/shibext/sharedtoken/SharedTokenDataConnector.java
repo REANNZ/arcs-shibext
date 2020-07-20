@@ -116,7 +116,12 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (MiscHelper.isEmpty(generatedAttributeId)) 
 			throw new ComponentInitializationException(
 					"Generated attribute ID must be set and not empty");
-		
+
+		// throw an error is both storeDatabase and storeLdap are true
+		if (storeDatabase && getStoreLdap()) {
+			throw new ComponentInitializationException("Only one of storeDatabase, storeLdap can be set to true");
+		}
+
 		if (storeDatabase) {
 			if (stStore == null) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
@@ -146,12 +151,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (!storeDatabase && !getStoreLdap()) {
 			log.warn("SharedTokenDataConnector {} is configured to store values neither in database nor in LDAP.  SharedToken values generated on the fly SHOULD NOT be used on production systems.", getId());
 		}
-		
-		// also log a warning if both are true
-		if (storeDatabase && getStoreLdap()) {
-			log.warn("SharedTokenDataConnector {} is configured to store values both in database and in LDAP.  The database setting have higher precedence and LDAP will NOT be consulted for sharedToken values.", getId());
-		}
-		
+
 		// log a warning if any of the attributes listed in getSourceAttributeId() cannot be found in the getDependencies() Set
 		String[] ids = getSourceAttributeId().split(SEPARATOR);
 		for (int i = 0; i < ids.length; i++) {
