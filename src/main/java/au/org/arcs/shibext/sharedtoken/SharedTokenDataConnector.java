@@ -194,12 +194,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 				String uid = resolutionContext.getPrincipal();
 
-				if (stStore != null) {
-					sharedToken = stStore.getSharedToken(uid);
-				} else {
-					log.error("SharedTokenStore is null");
-					throw new IMASTException("SharedTokenStore is null");
-				}
+				sharedToken = stStore.getSharedToken(uid);
 				if (sharedToken == null) {
 					log.debug("sharedToken does not exist, will generate a new one and store in database.");
 					sharedToken = getSharedToken(resolutionContext, resolverWorkContext);
