@@ -12,7 +12,7 @@
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <idpVersion>4.0.0</idpVersion>
+      <idpVersion>4.0.1</idpVersion>
     </properties>
 
     <repositories>
