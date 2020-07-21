@@ -490,13 +490,38 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		// get list of already resolved attributes (from dependencies)
 		Map <String,ResolvedAttributeDefinition> resolvedAttributesMap = 
 				resolverWorkContext.getResolvedIdPAttributeDefinitions();	
+		Map <String, ResolvedDataConnector> resolvedDataConnectors = resolverWorkContext.getResolvedDataConnectors();
 
 		StringBuffer localIdValue = new StringBuffer();
 		for (int i = 0; i < ids.length; i++) {
 			Collection<IdPAttributeValue> sourceIdValues = null;
 			
-			if (resolvedAttributesMap.get(ids[i]) != null ) 
-				sourceIdValues = resolvedAttributesMap.get(ids[i]).getResolvedAttribute().getValues();
+			// first try looking up the sourceAttributeId among explicitly defined attributes
+			ResolvedAttributeDefinition attrDef = resolvedAttributesMap.get(ids[i]);
+			if (attrDef != null ) {
+				// NOTE: not checking if the attribute is listed among dependencies
+				sourceIdValues = attrDef.getResolvedAttribute().getValues();
+				if (sourceIdValues != null && !sourceIdValues.isEmpty())
+					log.trace("found source attribute {} in attribute {}", ids[i], attrDef.getId());
+			}
+
+			// next try try looking up the sourceAttributeId across all connectors
+			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
+				for (Iterator<String> dcIt = resolvedDataConnectors.keySet().iterator(); dcIt.hasNext(); ) {
+					ResolvedDataConnector dc = resolvedDataConnectors.get(dcIt.next());
+					// only consider connectors explicitly listed as dependencies
+					if (!dependenciesContainsId(getDependencies(), dc.getId()))
+						continue;
+					IdPAttribute dcAttr = dc.getResolvedAttributes().get(ids[i]);
+					// only get the right attr
+					if (dcAttr != null)
+						sourceIdValues = dcAttr.getValues();
+					if (sourceIdValues != null && !sourceIdValues.isEmpty()) {
+						log.trace("found source attribute {} in connector {}", ids[i], dc.getId());
+						break;
+					}
+				}
+			}
 
 			if (sourceIdValues == null || sourceIdValues.isEmpty()) {
 				log.error("Source attribute {} for connector {} provide no values",
