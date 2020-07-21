@@ -136,7 +136,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			// whenever we are using LDAP for reading or writing, we need to see the LDAP connector among dependencies
 
 			// if ldapConnectorId is provided, check it can be found in the provided dependencies
-			if (ldapConnectorId != null && !dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ldapConnectorId)) {
+			if (ldapConnectorId != null && !dependenciesContainsId(null, getDataConnectorDependencies(), ldapConnectorId)) {
 				throw new ComponentInitializationException("SharedToken ID " + getId()
 						+ " is configured to use LDAP connector ID " + ldapConnectorId
 						+ " but the connector is not listed in dependencies");
