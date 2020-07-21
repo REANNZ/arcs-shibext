@@ -393,7 +393,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		if (Pattern.matches("^[a-zA-Z0-9@\\\\]+$", localId))
 			return localId;	
 		else
-			return Base64.encodeBase64String(localId.getBytes());
+			return "BASE64:"+Base64.encodeBase64String(localId.getBytes());
 	}
 
 	/**
@@ -425,8 +425,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				localEntityId = idpIdentifier;
 			}
 			String globalUniqueID = localId + localEntityId + new String(salt);
-			log.debug("the globalUniqueID (user/idp/salt): " + printableLocalId(localId) + " / "
-					+ localEntityId + " / " + new String(salt));
+			log.debug("the globalUniqueID (user/idp/salt): {} / {} / {}", printableLocalId(localId), localEntityId,  new String(salt));
 			byte[] hashValue = DigestUtils.sha1(globalUniqueID);
 			byte[] encodedValue = Base64.encodeBase64(hashValue);
 			persistentId = new String(encodedValue);
@@ -537,7 +536,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			}
 			localIdValue.append(sourceIdValues.iterator().next().getNativeValue().toString());
 		}
-		log.debug("local ID: " + printableLocalId(localIdValue.toString()));
+		log.debug("local ID: {}", printableLocalId(localIdValue.toString()));
 
 		return localIdValue.toString();
 	}
