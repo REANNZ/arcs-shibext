@@ -148,7 +148,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			log.warn("SharedTokenDataConnector {} is configured to store values neither in database nor in LDAP.  SharedToken values generated on the fly SHOULD NOT be used on production systems.", getId());
 		}
 
-		// log a warning if any of the attributes listed in sourceAttributeId cannot be found in the getDependencies() Set
+		// log a warning if any of the attributes listed in sourceAttributeId cannot be found in the provided dependencies (InputAttrDef/InputDC)
 		String[] ids = sourceAttributeId.split(SEPARATOR);
 		for (int i = 0; i < ids.length; i++) {
 			if (!dependenciesContainsId(getAttributeDependencies(), getDataConnectorDependencies(), ids[i])) {
@@ -543,21 +543,23 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	}
 	
 	private boolean dependenciesContainsId(Set<ResolverAttributeDefinitionDependency> attrDependencies,
-                Set<ResolverDataConnectorDependency> dcDependencies, String id) {
+			Set<ResolverDataConnectorDependency> dcDependencies, String id) {
 
-            for (Iterator<ResolverAttributeDefinitionDependency> it=attrDependencies.iterator(); it.hasNext(); ) {
-                    if (it.next().getDependencyPluginId().equals(id)) return true;
-            }
-            for (Iterator<ResolverDataConnectorDependency> it=dcDependencies.iterator(); it.hasNext(); ) {
-                    ResolverDataConnectorDependency dc = it.next();
-                    if (dc.getDependencyPluginId().equals(id)) return true;
+		if (attrDependencies != null)
+			for (Iterator<ResolverAttributeDefinitionDependency> it=attrDependencies.iterator(); it.hasNext(); ) {
+				if (it.next().getDependencyPluginId().equals(id)) return true;
+			}
+		if (dcDependencies != null)
+			for (Iterator<ResolverDataConnectorDependency> it=dcDependencies.iterator(); it.hasNext(); ) {
+				ResolverDataConnectorDependency dc = it.next();
+				if (dc.getDependencyPluginId().equals(id)) return true;
 
-                    // accept also a name of an attribute on a DataConnector dependency
-                    for (Iterator<String> it2 = dc.getAttributeNames().iterator(); it2.hasNext(); ) {
-                        if (it2.next().equals(id)) return true;
-                    }
-            }
-            return false;
+				// accept also a name of an attribute on a DataConnector dependency
+				for (Iterator<String> it2 = dc.getAttributeNames().iterator(); it2.hasNext(); ) {
+				    if (it2.next().equals(id)) return true;
+				}
+			}
+		return false;
 	}
 
 	/**
