@@ -489,7 +489,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		String[] ids = sourceAttributeId.split(SEPARATOR);
 		// get list of already resolved attributes (from dependencies)
 		Map <String,ResolvedAttributeDefinition> resolvedAttributesMap = 
-				resolverWorkContext.getResolvedIdPAttributeDefinitions();	
+				resolverWorkContext.getResolvedIdPAttributeDefinitions();
 		Map <String, ResolvedDataConnector> resolvedDataConnectors = resolverWorkContext.getResolvedDataConnectors();
 
 		StringBuffer localIdValue = new StringBuffer();
@@ -498,7 +498,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			
 			// first try looking up the sourceAttributeId among explicitly defined attributes
 			ResolvedAttributeDefinition attrDef = resolvedAttributesMap.get(ids[i]);
-			if (attrDef != null ) {
+			if ( attrDef != null  && !dependenciesContainsId(getAttributeDependencies(), null, attrDef.getId()) ) {
 				// NOTE: not checking if the attribute is listed among dependencies
 				sourceIdValues = attrDef.getResolvedAttribute().getValues();
 				if (sourceIdValues != null && !sourceIdValues.isEmpty())
@@ -510,7 +510,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				for (Iterator<String> dcIt = resolvedDataConnectors.keySet().iterator(); dcIt.hasNext(); ) {
 					ResolvedDataConnector dc = resolvedDataConnectors.get(dcIt.next());
 					// only consider connectors explicitly listed as dependencies
-					if (!dependenciesContainsId(getDependencies(), dc.getId()))
+					if (!dependenciesContainsId(null, getDataConnectorDependencies(), dc.getId()))
 						continue;
 					IdPAttribute dcAttr = dc.getResolvedAttributes().get(ids[i]);
 					// only get the right attr
