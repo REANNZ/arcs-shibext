@@ -3,9 +3,6 @@
  */
 package au.org.arcs.shibext.sharedtoken;
 
-import java.util.List;
-
-import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import net.shibboleth.idp.attribute.resolver.spring.dc.AbstractDataConnectorParser;
