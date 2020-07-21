@@ -12,6 +12,7 @@
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <idpVersion>4.0.0</idpVersion>
     </properties>
 
     <repositories>
@@ -31,25 +32,25 @@
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-api</artifactId>
-            <version>4.0.1</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-api</artifactId>
-            <version>4.0.1</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-impl</artifactId>
-            <version>4.0.1</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-spring</artifactId>
-            <version>4.0.1</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
