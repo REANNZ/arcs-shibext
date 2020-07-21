@@ -46,9 +46,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
 			pluginBuilder.addPropertyValue("generatedAttributeId", pluginConfig
 					.getAttributeNS(null, "generatedAttributeID"));
-		} else {
-			pluginBuilder.addPropertyValue("generatedAttributeId",
-					"auEduPersonSharedToken");
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "idpIdentifier")) {
@@ -60,8 +57,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeLdap", AttributeSupport
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeLdap")));
-		} else {
-			pluginBuilder.addPropertyValue("storeLdap", true);
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "ldapConnectorId")) {
@@ -83,8 +78,6 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 			pluginBuilder.addPropertyValue("storeDatabase", AttributeSupport
 					.getAttributeValueAsBoolean(pluginConfig
 							.getAttributeNodeNS(null, "storeDatabase")));
-		} else {
-			pluginBuilder.addPropertyValue("storeDatabase", false);
 		}
 
 		if (pluginConfig.hasAttributeNS(null, "databaseConnectionID")) {
