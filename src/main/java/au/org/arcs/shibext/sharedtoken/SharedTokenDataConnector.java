@@ -98,7 +98,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 	public SharedTokenDataConnector() {
 		super();
-		log.debug("construct empty SharedTokenDataConnector ...");
 	}
 
 	/** Initialize the connector - check all required properties have been set
@@ -107,7 +106,6 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	@Override
 	protected void doInitialize() throws ComponentInitializationException {
 		super.doInitialize();
-		log.debug("Initialize called on SharedTokenDataConnector {}", getId());
 
 		if (MiscHelper.isEmpty(sourceAttributeId))
 			throw new ComponentInitializationException(
@@ -416,7 +414,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 			AttributeResolutionContext resolutionContext, String localId,
 			byte[] salt) throws ResolutionException {
 		String persistentId;
-		log.debug("creating a sharedToken ...");
+		log.debug("creating a sharedToken value");
 		try {
 			String localEntityId = null;
 			if (this.idpIdentifier == null) {
@@ -483,7 +481,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 	private String getLocalId(AttributeResolutionContext resolutionContext, AttributeResolverWorkContext resolverWorkContext)
 			throws ResolutionException {
 
-		log.debug("gets local ID ...");
+		log.debug("get local ID (from source ID attribute values)");
 
 		String[] ids = sourceAttributeId.split(SEPARATOR);
 		// get list of already resolved attributes (from dependencies)
