@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.org.arcs.shibext</groupId>
     <artifactId>arcs-shibext</artifactId>
-    <version>1.9.1</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>auEduPersonSharedToken Shibboleth IdPv3 Extension</name>
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <idpVersion>4.0.1</idpVersion>
     </properties>
 
     <repositories>
@@ -31,25 +32,25 @@
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-api</artifactId>
-            <version>3.4.0</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-api</artifactId>
-            <version>3.4.0</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-impl</artifactId>
-            <version>3.4.0</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.idp</groupId>
             <artifactId>idp-attribute-resolver-spring</artifactId>
-            <version>3.4.0</version>
+            <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -61,8 +62,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <debug>true</debug>
                 </configuration>
             </plugin>
@@ -87,17 +88,16 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-    </build>
 
-    <reporting>
-        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
+                    <source>1.8</source>
                     <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
+                        <link>https://build.shibboleth.net/nexus/service/local/repositories/site/content/java-identity-provider/${idpVersion}/apidocs</link>
                     </links>
                     <quiet>true</quiet>
                     <author>false</author>
@@ -108,68 +108,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </reporting>
-    
-    <!-- 
-        You can leave the following information commented out fill it in with information 
-        appropriate for your extension.
-    -->
-    
-    <!-- Project Metadata -->
-    <!--
-    <url>https://opensaml.org/</url>
-    
-    <inceptionYear>2006</inceptionYear>
-        <licenses>
-        <license>
-            <name>Apache 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    
-    <organization>
-        <name>Internet2</name>
-        <url>http://www.internet2.edu/</url>
-    </organization>
-    
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://bugs.internet2.edu/</url>
-    </issueManagement>
-    
-    <mailingLists>
-        <mailingList>
-            <name>OpenSAML Users</name>
-            <subscribe>https://spaces.internet2.edu/display/OpenSAML/MailingList</subscribe>
-            <unsubscribe>https://spaces.internet2.edu/display/OpenSAML/MailingList</unsubscribe>
-            <post>mace-opensaml-users@internet2.edu</post>
-            <archive>https://mail.internet2.edu/wws/arc/mace-opensaml-users</archive>
-            <otherArchives>
-                <otherArchive>http://groups.google.com/group/opensaml-users</otherArchive>
-            </otherArchives>
-        </mailingList>
-    </mailingLists>
-    
-    <scm>
-        <connection>scm:svn:https://svn.middleware.georgetown.edu/java-opensaml2/</connection>
-        <developerConnection>scm:svn:https://svn.middleware.georgetown.edu/java-opensaml2/</developerConnection>
-        <tag>HEAD</tag>
-        <url>http://svn.middleware.georgetown.edu/view/?root=java-opensaml2</url>
-    </scm>
-
-    <developers>
-        <developer>
-            <id>lajoie</id>
-            <name>Chad La Joie</name>
-            <organization>SWITCH</organization>
-            <organizationUrl>http://www.switch.ch/</organizationUrl>
-            <roles>
-                <role>developer</role>
-                <role>documentation</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
-    -->
+    </build>
 </project>
