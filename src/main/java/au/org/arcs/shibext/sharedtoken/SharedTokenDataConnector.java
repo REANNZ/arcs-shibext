@@ -495,7 +495,8 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 			// first try looking up the sourceAttributeId among explicitly defined attributes
 			ResolvedAttributeDefinition attrDef = resolvedAttributesMap.get(ids[i]);
-			if ( attrDef != null  && !dependenciesContainsId(getAttributeDependencies(), null, attrDef.getId()) ) {
+
+			if ( attrDef != null  && dependenciesContainsId(getAttributeDependencies(), null, attrDef.getId()) ) {
 				// NOTE: not checking if the attribute is listed among dependencies
 				sourceIdValues = attrDef.getResolvedAttribute().getValues();
 				if (sourceIdValues != null && !sourceIdValues.isEmpty())
