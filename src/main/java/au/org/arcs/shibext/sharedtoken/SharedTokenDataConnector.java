@@ -189,6 +189,12 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 				String uid = resolutionContext.getPrincipal();
 
+				// Sanity check (in case the connector gets invoked during c14n resolution stage)
+				if (uid == null) {
+					log.error("Principal must not be null");
+					throw new ResolutionException("Principal must not be null");
+				}
+
 				sharedToken = stStore.getSharedToken(uid);
 				if (sharedToken == null) {
 					log.debug("sharedToken does not exist, will generate a new one and store in database.");
