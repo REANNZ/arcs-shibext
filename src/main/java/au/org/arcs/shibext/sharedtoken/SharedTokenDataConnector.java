@@ -39,6 +39,7 @@ import net.shibboleth.idp.attribute.resolver.dc.ldap.impl.LDAPDataConnector;
 import net.shibboleth.idp.attribute.resolver.ResolutionException;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
+import net.shibboleth.idp.attribute.EmptyAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.resolver.ResolverAttributeDefinitionDependency;
 import net.shibboleth.idp.attribute.resolver.ResolverDataConnectorDependency;
@@ -533,7 +534,19 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				log.warn("Source attribute {} for connector {} has more than one value, only the first value is used",
 						ids[i], getId());
 			}
-			localIdValue.append(sourceIdValues.iterator().next().getNativeValue().toString());
+
+			Object localIdNativeValue = sourceIdValues.iterator().next().getNativeValue();
+			log.trace("Local attribute {} returned native value {} of type {}", ids[i], localIdNativeValue, localIdNativeValue.getClass());
+			if (localIdNativeValue == null ||
+				localIdNativeValue.equals(EmptyAttributeValue.EmptyType.NULL_VALUE) ||
+				localIdNativeValue.equals(EmptyAttributeValue.EmptyType.ZERO_LENGTH_VALUE)) {
+				log.error("Source attribute {} for connector {} provided EmptyAttributeValue {}",
+						ids[i], getId(), localIdNativeValue);
+				throw new ResolutionException("Source attribute "
+						+ ids[i] + " for connector " + getId()
+						+ " provided EmptyAttributeValue " + localIdNativeValue);
+			}
+			localIdValue.append(localIdNativeValue.toString());
 		}
 		log.debug("local ID: {}", printableLocalId(localIdValue.toString()));
 
