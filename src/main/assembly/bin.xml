@@ -10,10 +10,10 @@
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
             <excludes>
-                <exclude>net.shibboleth.idp:idp-attribute-api:*</exclude>
-                <exclude>net.shibboleth.idp:idp-attribute-resolver-api:*</exclude>
-                <exclude>net.shibboleth.idp:idp-attribute-resolver-impl:*</exclude>
-                <exclude>net.shibboleth.idp:idp-attribute-resolver-spring:*</exclude>
+                <exclude>net.shibboleth:shib-attribute-api:*</exclude>
+                <exclude>net.shibboleth:shib-attribute-resolver-api:*</exclude>
+                <exclude>net.shibboleth:shib-attribute-resolver-impl:*</exclude>
+                <exclude>net.shibboleth:shib-attribute-resolver-spring:*</exclude>
             </excludes>
             <includes>
                 <include>*:jar:*</include>

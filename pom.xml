@@ -12,7 +12,7 @@
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <idpVersion>4.0.1</idpVersion>
+      <idpVersion>5.0.0</idpVersion>
     </properties>
 
     <repositories>
@@ -30,26 +30,26 @@
     <dependencies>
          <!-- Provided dependencies -->
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-api</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-api</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-api</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-api</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-impl</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-impl</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-spring</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-spring</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
