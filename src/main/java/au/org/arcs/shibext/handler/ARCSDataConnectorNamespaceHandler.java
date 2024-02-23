@@ -3,7 +3,7 @@
  */
 package au.org.arcs.shibext.handler;
 
-import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
+import net.shibboleth.shared.spring.custom.BaseSpringNamespaceHandler;
 import au.org.arcs.shibext.sharedtoken.SharedTokenDataConnectorBeanDefinitionParser;
 
 /**

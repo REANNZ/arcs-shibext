@@ -43,8 +43,8 @@ import net.shibboleth.idp.attribute.EmptyAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.resolver.ResolverAttributeDefinitionDependency;
 import net.shibboleth.idp.attribute.resolver.ResolverDataConnectorDependency;
-import net.shibboleth.utilities.java.support.collection.LazyMap;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.shared.collection.LazyMap;
+import net.shibboleth.shared.component.ComponentInitializationException;
 
 /**
  * @author Damien Chen
