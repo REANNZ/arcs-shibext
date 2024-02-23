@@ -243,7 +243,10 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				IdPAttribute sharedTokenFromLDAP = null;
 				if (ldapConnectorId != null) {
 					ResolvedDataConnector ldapDcResolved = resolverWorkContext.getResolvedDataConnectors().get(ldapConnectorId);
-					sharedTokenFromLDAP = ldapDcResolved.getResolvedAttributes().get(storedAttributeName);
+					Map<String,IdPAttribute> resolvedAttributes = ldapDcResolved.getResolvedAttributes();
+					if (resolvedAttributes != null) {
+						sharedTokenFromLDAP = resolvedAttributes.get(storedAttributeName);
+					}
 				}
 
 				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
