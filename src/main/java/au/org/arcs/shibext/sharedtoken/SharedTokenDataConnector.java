@@ -274,7 +274,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		}
 		if (sharedToken != null) {
 			IdPAttribute attribute = new IdPAttribute(generatedAttributeId);
-			Collection<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
+			List<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
 			values.add(new StringAttributeValue(sharedToken));
 			attribute.setValues(values);
 			attributes.put(attribute.getId(), attribute);

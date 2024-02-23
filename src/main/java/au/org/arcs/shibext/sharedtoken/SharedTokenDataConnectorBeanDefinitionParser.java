@@ -33,15 +33,17 @@ public class SharedTokenDataConnectorBeanDefinitionParser extends
 
 	/** {@inheritDoc} */
 	@Override
-	protected Class<SharedTokenDataConnector> getNativeBeanClass() {
+	protected Class<SharedTokenDataConnector> getBeanClass(final Element element) {
 		return SharedTokenDataConnector.class;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	protected void doV2Parse(Element pluginConfig,
+	protected void doParse(Element pluginConfig,
 			ParserContext parserContext,
 			BeanDefinitionBuilder pluginBuilder) {
+
+		super.doParse(pluginConfig, parserContext, pluginBuilder);
 
 		if (pluginConfig.hasAttributeNS(null, "generatedAttributeID")) {
 			pluginBuilder.addPropertyValue("generatedAttributeId", pluginConfig
