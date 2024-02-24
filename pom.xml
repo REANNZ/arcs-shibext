@@ -13,6 +13,7 @@
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <idpVersion>5.0.0</idpVersion>
+      <shibSharedVersion>9.0.0</shibSharedVersion>
     </properties>
 
     <repositories>
@@ -96,8 +97,10 @@
                 <configuration>
                     <source>1.8</source>
                     <links>
-                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                        <link>https://build.shibboleth.net/nexus/service/local/repositories/site/content/java-identity-provider/${idpVersion}/apidocs</link>
+                        <link>http://docs.oracle.com/javase/17/docs/api/</link>
+                        <link>http://shibboleth.net/api/java-identity-provider/${idpVersion}</link>
+                        <link>http://shibboleth.net/api/java-shib-attribute/${idpVersion}</link>
+                        <link>http://shibboleth.net/api/java-shib-shared/${shibSharedVersion}</link>
                     </links>
                     <quiet>true</quiet>
                     <author>false</author>
