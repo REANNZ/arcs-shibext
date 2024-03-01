@@ -12,7 +12,8 @@
 
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <idpVersion>4.0.1</idpVersion>
+      <idpVersion>5.0.0</idpVersion>
+      <shibSharedVersion>9.0.0</shibSharedVersion>
     </properties>
 
     <repositories>
@@ -30,26 +31,26 @@
     <dependencies>
          <!-- Provided dependencies -->
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-api</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-api</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-api</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-api</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-impl</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-impl</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-attribute-resolver-spring</artifactId>
+            <groupId>net.shibboleth</groupId>
+            <artifactId>shib-attribute-resolver-spring</artifactId>
             <version>${idpVersion}</version>
             <scope>compile</scope>
         </dependency>
@@ -83,7 +84,7 @@
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -96,8 +97,10 @@
                 <configuration>
                     <source>1.8</source>
                     <links>
-                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                        <link>https://build.shibboleth.net/nexus/service/local/repositories/site/content/java-identity-provider/${idpVersion}/apidocs</link>
+                        <link>http://docs.oracle.com/javase/17/docs/api/</link>
+                        <link>http://shibboleth.net/api/java-identity-provider/${idpVersion}</link>
+                        <link>http://shibboleth.net/api/java-shib-attribute/${idpVersion}</link>
+                        <link>http://shibboleth.net/api/java-shib-shared/${shibSharedVersion}</link>
                     </links>
                     <quiet>true</quiet>
                     <author>false</author>

@@ -17,15 +17,13 @@ import javax.sql.DataSource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.ldaptive.AttributeModification;
-import org.ldaptive.AttributeModificationType;
 import org.ldaptive.Connection;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.ModifyRequest;
-import org.ldaptive.Response;
+import org.ldaptive.Result;
 import org.ldaptive.ResultCode;
-import org.ldaptive.SearchResult;
-import org.ldaptive.provider.ProviderConnection;
+import org.ldaptive.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +41,8 @@ import net.shibboleth.idp.attribute.EmptyAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.resolver.ResolverAttributeDefinitionDependency;
 import net.shibboleth.idp.attribute.resolver.ResolverDataConnectorDependency;
-import net.shibboleth.utilities.java.support.collection.LazyMap;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.shared.collection.LazyMap;
+import net.shibboleth.shared.component.ComponentInitializationException;
 
 /**
  * @author Damien Chen
@@ -244,8 +242,11 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 				// But for now, let's get storedAttributeName as a ResolvedAttribute from the sharedTokenDC directly.
 				IdPAttribute sharedTokenFromLDAP = null;
 				if (ldapConnectorId != null) {
-					ResolvedDataConnector ldapDc = resolverWorkContext.getResolvedDataConnectors().get(ldapConnectorId);
-					sharedTokenFromLDAP = ldapDc.getResolvedAttributes().get(storedAttributeName);
+					ResolvedDataConnector ldapDcResolved = resolverWorkContext.getResolvedDataConnectors().get(ldapConnectorId);
+					Map<String,IdPAttribute> resolvedAttributes = ldapDcResolved.getResolvedAttributes();
+					if (resolvedAttributes != null) {
+						sharedTokenFromLDAP = resolvedAttributes.get(storedAttributeName);
+					}
 				}
 
 				if (sharedTokenFromLDAP==null || sharedTokenFromLDAP.getValues().size() < 1) {
@@ -274,7 +275,7 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		}
 		if (sharedToken != null) {
 			IdPAttribute attribute = new IdPAttribute(generatedAttributeId);
-			Collection<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
+			List<IdPAttributeValue> values = new ArrayList<IdPAttributeValue>();
 			values.add(new StringAttributeValue(sharedToken));
 			attribute.setValues(values);
 			attributes.put(attribute.getId(), attribute);
@@ -342,21 +343,21 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 			// now we can construct a search filter
 			ExecutableSearchFilter sf = ldapDc.getExecutableSearchBuilder().build(resolutionContext, resolvedAttributeValues);
-			SearchResult sr = sf.execute(ldapDc.getSearchExecutor(), ldapDc.getConnectionFactory());
-			if ( sr.size() == 0 ) throw new IMASTException("No search results found - cannot store sharedToken");
+			SearchResponse sr = sf.execute(ldapDc.getSearchOperation(), ldapDc.getConnectionFactory());
+			if ( sr.entrySize() == 0 ) throw new IMASTException("No search results found - cannot store sharedToken");
 			String targetDn = null;
 			for (Iterator<LdapEntry> itSr = sr.getEntries().iterator(); itSr.hasNext(); ) {
 				LdapEntry srEntry = itSr.next();
 				log.debug("Search Result Entry DN is {}", srEntry.getDn());
 				targetDn = srEntry.getDn();
 			}
-			if ( sr.size() > 1 ) {
+			if ( sr.entrySize() > 1 ) {
 				log.warn("Multiple search results found, only last one will be updated ({})", targetDn);
 			}
 
 			// now construct a Modify operation
 			ModifyRequest mr = new ModifyRequest(targetDn,
-					new AttributeModification(AttributeModificationType.ADD,
+					new AttributeModification(AttributeModification.Type.ADD,
 							new LdapAttribute(storedAttributeName, sharedToken)));
 
 			log.info("adding {}:{} to {}:{}", storedAttributeName, sharedToken,
@@ -364,9 +365,8 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 
 			// and get a connection and apply the modify operation
 			Connection ldapConn = ldapDc.getConnectionFactory().getConnection();
-			checkLdapResponse(ldapConn.open());
-			ProviderConnection conn = ldapConn.getProviderConnection();
-			checkLdapResponse(conn.modify(mr));
+			ldapConn.open();
+			checkLdapResponse(ldapConn.operation(mr).execute());
 			ldapConn.close();
 
 		} catch (Exception e) {
@@ -377,9 +377,9 @@ public class SharedTokenDataConnector extends AbstractDataConnector {
 		}
 	}
 
-	private void checkLdapResponse(Response<Void> ldapResponse) throws IMASTException {
-		if (ldapResponse.getResultCode()!=ResultCode.SUCCESS)
-			throw new IMASTException("LDAP response was not SUCCESS but " + ldapResponse.getResultCode().toString() + " " + ldapResponse.getMessage());
+	private void checkLdapResponse(Result ldapResult) throws IMASTException {
+		if (ldapResult.getResultCode()!=ResultCode.SUCCESS)
+			throw new IMASTException("LDAP response was not SUCCESS but " + ldapResult.getResultCode().toString() + " " + ldapResult.getDiagnosticMessage());
 	}
 
 	/**
